@@ -1,0 +1,27 @@
+name: ficha
+description: A new Flutter project.
+
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.6 <4.3.1"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  mobx: ^2.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - Shield.png
+
