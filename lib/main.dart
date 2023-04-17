@@ -1,10 +1,19 @@
-import 'package:ficha/core/shadowbox.dart';
-import 'package:ficha/core/textinput.dart';
+import 'package:ficha/right_panel/controllers/drawercontroller.dart';
+import 'package:ficha/right_panel/inventory.dart';
+import 'package:ficha/right_panel/top-right-panel.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:ficha/atributes.dart/status-box.dart';
+import 'atributes/Status-list.dart';
+import 'center_panel/center-panel.dart';
+import 'center_panel/controllers/status_controller/StatusController.dart';
+import 'bottom_panel/BottomRow.dart';
+import 'models/model.dart';
 
 //width fixa
-
+final DescriptionDrawerController drawerController =
+    DescriptionDrawerController();
+final SpellList spells = SpellList();
+final EquipmentList equipments = EquipmentList();
 void main() {
   runApp(const MyApp());
 }
@@ -14,8 +23,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: MainPage(), theme: ThemeData.dark(useMaterial3: true));
+        scrollBehavior: MyCustomScrollBehavior(),
+        home: const MainPage(),
+        theme: ThemeData.dark(useMaterial3: true));
   }
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }
 
 class MainPage extends StatefulWidget {
@@ -28,179 +47,43 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final StatusController controller = StatusController();
+  final ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        endDrawer: Drawer(
+          child: DescriptionDrawer(controller: drawerController),
+          width: 400,
+        ),
         appBar: AppBar(
           toolbarHeight: 80,
         ),
-        body: SingleChildScrollView(
-            child: ShadowBox(
-                direction: Axis.horizontal,
-                crossAxis: CrossAxisAlignment.center,
-                mainAxis: MainAxisAlignment.start,
-                width: double.infinity,
-                children: [
-              Expanded(
+        body: Scrollbar(
+          controller: scrollController,
+          child: SingleChildScrollView(
+            controller: scrollController,
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1500),
                 child: Column(
                   children: [
                     Row(
                       children: [
-                        Column(children: const [
-                          StatusBox(
-                              attr: 'Strenght', proficiencies: ['Atletics']),
-                          StatusBox(attr: 'Dexterity', proficiencies: [
-                            'Acrobatics',
-                            'Sneaky',
-                            'Sleight of hands'
-                          ]),
-                          StatusBox(attr: 'Constitution', proficiencies: []),
-                          StatusBox(attr: 'Inteligence', proficiencies: [
-                            'Arcana',
-                            'History',
-                            'Investigation',
-                            'Nature',
-                            'Religion'
-                          ]),
-                          StatusBox(attr: 'Wisdom', proficiencies: [
-                            'Intuition',
-                            'Animal Handling',
-                            'Medicine',
-                            'Perception',
-                            'Survival'
-                          ]),
-                          StatusBox(attr: 'Charism', proficiencies: [
-                            'Performance',
-                            'Deception',
-                            'Intimidation',
-                            'Persuasion'
-                          ])
-                        ]),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              ShadowBox(
-                                crossAxis: CrossAxisAlignment.start,
-                                height: 400,
-                                width: double.infinity,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(child: DefenseBox()),
-                                      Expanded(child: DefenseBox()),
-                                      Expanded(child: DefenseBox()),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                          width: 180,
-                                          child:
-                                              FittedBox(child: DefenseBox())),
-                                      const ShadowBox(
-                                        width: 200,
-                                        height: 200,
-                                        children: [
-                                          const Text(
-                                              "health, armor,initiative,moviment,proficiencie,hit die,passive wisdom, bonus health")
-                                        ],
-                                      )
-                                    ],
-                                  ), // melhorar defense box para variar tamanho
-                                ],
-                              ),
-                              const ShadowBox(
-                                height: 580,
-                                width: double.infinity,
-                                children: [Text("attacks")],
-                              )
-                            ],
-                          ),
+                        StatusList(
+                          controller: controller,
                         ),
-                        Expanded(
-                          child: Column(children: [
-                            SizedBox(
-                              height: 200,
-                              child: Row(children: const [
-                                Expanded(
-                                  child: ShadowBox(
-                                    height: 200,
-                                    children: [Text("Saving, Dsaving")],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: ShadowBox(
-                                    height: 200,
-                                    children: [Text("special resouces")],
-                                  ),
-                                )
-                              ]),
-                            ),
-                            const ShadowBox(
-                              height: 580,
-                              width: double.infinity,
-                              children: [Text("Inventory")],
-                            ),
-                            const ShadowBox(
-                              height: 180,
-                              width: double.infinity,
-                              children: [Text("conjuration")],
-                            )
-                          ]),
-                        ),
+                        CenterColumn(controller: controller),
+                        RightPanel()
                       ],
                     ),
-                    Row(
-                      children: const [
-                        Expanded(
-                          child: ShadowBox(
-                            height: 200,
-                            children: [Text("Tool Proficiencies")],
-                          ),
-                        ),
-                        Expanded(
-                          child: ShadowBox(
-                            height: 200,
-                            children: [Text("Languages")],
-                          ),
-                        )
-                      ],
-                    )
+                    const BottomRow()
                   ],
                 ),
               ),
-            ])));
-  }
-}
-
-class DefenseBox extends StatelessWidget {
-  DefenseBox({super.key});
-  Image img = Image.asset("Shield.png");
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 120,
-      height: 120,
-      child: Stack(alignment: AlignmentDirectional.center, children: [
-        SizedBox(width: 120, height: 120, child: FittedBox(child: img)),
-        Padding(
-          padding: const EdgeInsets.only(top: 28.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              SizedBox(width: 60, child: TextInputBox()),
-              Text(
-                'AC',
-                softWrap: true,
-                style: TextStyle(
-                    fontSize: 19,
-                    color: Colors.white,
-                    backgroundColor: Color.fromARGB(101, 0, 0, 0)),
-              ),
-            ],
+            ),
           ),
-        )
-      ]),
-    );
+        ));
   }
 }
