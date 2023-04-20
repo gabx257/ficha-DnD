@@ -6,7 +6,7 @@ class DropDownSelectionController = _DropDownSelectionControllerBase
 
 abstract class _DropDownSelectionControllerBase with Store {
   @observable
-  String value = "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";
+  String value = "";
 
   @observable
   ObservableList<String> items = ObservableList.of([]);
@@ -15,5 +15,11 @@ abstract class _DropDownSelectionControllerBase with Store {
   void add(String item) {
     items.add(item);
     value = item;
+  }
+
+  @action
+  void remove(String item) {
+    items.remove(item);
+    value = "";
   }
 }

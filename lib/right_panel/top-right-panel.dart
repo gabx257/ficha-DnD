@@ -1,29 +1,55 @@
-import 'package:ficha/atributes/status-box.dart';
+import 'package:ficha/atributes/status_controller/StatusController.dart';
+import 'package:ficha/main.dart';
 import 'package:ficha/right_panel/inventory.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
-import '../core/controllers/dropdownselection_controller.dart';
+import '../core/controllers/dropdownselectioncontroller/dropdownselection_controller.dart';
 import '../core/shadowbox.dart';
-import '../models/model.dart';
+
+class RightPanelData extends InheritedWidget {
+  final StatusController statusController;
+  const RightPanelData({
+    super.key,
+    required super.child,
+    required this.statusController,
+  });
+
+  @override
+  bool updateShouldNotify(covariant RightPanelData oldWidget) {
+    return oldWidget.statusController != statusController;
+  }
+
+  static RightPanelData? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<RightPanelData>();
+  }
+}
 
 class RightPanel extends StatelessWidget {
   RightPanel({
     super.key,
+    required this.statusController,
   });
-  final spells = SpellList();
+  final StatusController statusController;
   final DropDownSelectionController controller = DropDownSelectionController();
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      const TopRightPanel(),
-      const ShadowBox(
-        height: 180,
-        width: 600,
-        children: [Text("conjuration")],
-      ),
-      Inventory(controller: controller)
-    ]);
+    return RightPanelData(
+      statusController: statusController,
+      child: Column(children: [
+        const TopRightPanel(),
+        const ShadowBox(
+          height: 180,
+          width: 600,
+          children: [Text("conjuration")],
+        ),
+        Inventory(
+          list: equipments,
+          title: "Inventory",
+        ),
+      ]),
+    );
   }
 }
 
@@ -75,6 +101,84 @@ class SpecialResources extends StatelessWidget {
   }
 }
 
-class SavingThrows extends Proficiencies {
-  const SavingThrows({super.key, required super.proficiencies});
+class SavingThrows extends StatelessWidget {
+  const SavingThrows({
+    required this.proficiencies,
+    this.direction = Axis.vertical,
+    Key? key,
+  }) : super(key: key);
+  final List<String> proficiencies;
+  final Axis direction;
+
+  List<SavingThrowsLine> makeLine() {
+    List<SavingThrowsLine> out = [];
+    for (String proficiency in proficiencies) {
+      out.add(SavingThrowsLine(proficiency: proficiency));
+    }
+    return out;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+      flex: 2,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15.0),
+        child: Flex(
+            direction: direction,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: makeLine()),
+      ),
+    );
+  }
+}
+
+class SavingThrowsLine extends StatefulWidget {
+  const SavingThrowsLine({super.key, required this.proficiency});
+  final String proficiency;
+
+  @override
+  State<SavingThrowsLine> createState() => _SavingThrowsLineState();
+}
+
+class _SavingThrowsLineState extends State<SavingThrowsLine> {
+  bool state = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final StatusController controller =
+        RightPanelData.of(context)!.statusController;
+    return SizedBox(
+      height: 25,
+      child: Row(
+        children: [
+          Checkbox(
+              activeColor: const Color.fromARGB(255, 23, 71, 191),
+              checkColor: Colors.white,
+              splashRadius: 7,
+              shape: const CircleBorder(),
+              value: state,
+              onChanged: (s) {
+                setState(() {
+                  state = s!;
+                });
+              }),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 3, right: 2),
+            child: Text(widget.proficiency),
+          ),
+          Observer(builder: (_) {
+            return Text(
+                (((controller.status[widget.proficiency] ?? 0) - 10) ~/ 2)
+                    .toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    backgroundColor: Color.fromARGB(40, 255, 255, 255),
+                    fontSize: 10));
+          })
+        ],
+      ),
+    );
+  }
 }

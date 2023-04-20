@@ -15,7 +15,7 @@ dependencies:
   flutter_svg: ^2.0.4
   mobx: ^2.1.4
   flutter_mobx: ^2.0.6+5
-  dropdown_button2: ^1.8.1
+  dropdown_button2: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -29,3 +29,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/Shield.svg
+    - assets/spells.json
+    - assets/equipaments.json

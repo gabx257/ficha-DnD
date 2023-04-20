@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
-import '../core/shadowbox.dart';
-import '../core/textinput.dart';
-import 'center_panel_widgets.dart';
-import 'controllers/health_controler/health_controler.dart';
+import '../../core/shadowbox.dart';
+import '../../core/textinput.dart';
+import 'top_panel_containers.dart';
+import '../controllers/health_controler/health_controler.dart';
 
 class AllHealthContainers extends StatelessWidget {
   const AllHealthContainers({
@@ -21,6 +21,9 @@ class AllHealthContainers extends StatelessWidget {
     return Column(
       children: [
         HealthContainer(shapesSize: shapesSize, controller: controller),
+        const SizedBox(
+          height: 20,
+        ),
         TempHealthDSave(controller: controller)
       ],
     );

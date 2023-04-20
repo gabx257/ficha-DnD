@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../core/shadowbox.dart';
-import 'center_panel_widgets.dart';
-import 'controllers/health_controler/health_controler.dart';
-import 'controllers/hitdie_controler/hitdie_controler.dart';
+import '../../core/shadowbox.dart';
+import 'top_panel_containers.dart';
+import '../controllers/health_controler/health_controler.dart';
+import '../controllers/hitdie_controler/hitdie_controler.dart';
 
 class ACAndHitDie extends StatelessWidget {
   const ACAndHitDie({
@@ -35,6 +35,9 @@ class ACAndHitDie extends StatelessWidget {
             color: const Color.fromARGB(255, 129, 137, 179),
           ),
         ),
+      ),
+      const SizedBox(
+        height: 20,
       ),
       HitDieBox(controller: controller, dieController: dieController)
     ]);

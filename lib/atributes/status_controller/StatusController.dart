@@ -7,10 +7,10 @@ abstract class _StatusControllerBase with Store {
   @observable
   ObservableMap status = ObservableMap.of({
     'Dexterity': 10,
-    'Strenght': 10,
+    'Strength': 10,
     'Charisma': 10,
     'Wisdom': 10,
-    'Inteligence': 10,
-    'Constitutuin': 10,
+    'Intelligence': 10,
+    'Constitution': 10,
   });
 }

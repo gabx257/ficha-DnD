@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/textinput.dart';
+import '../../core/textinput.dart';
 
 class CenterPanelBoxes extends StatelessWidget {
   final String text;

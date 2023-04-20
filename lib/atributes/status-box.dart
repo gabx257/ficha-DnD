@@ -1,14 +1,17 @@
+import 'package:ficha/atributes/status_controller/StatusController.dart';
 import 'package:ficha/core/shadowbox.dart';
 import 'package:ficha/core/textinput.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
-import '../center_panel/controllers/status_controller/StatusController.dart';
-
 class StatusBoxData extends InheritedWidget {
   final StatusController controller;
+  final String attr;
   const StatusBoxData(
-      {super.key, required super.child, required this.controller});
+      {super.key,
+      required super.child,
+      required this.controller,
+      required this.attr});
 
   @override
   bool updateShouldNotify(covariant StatusBoxData oldWidget) {
@@ -22,9 +25,7 @@ class StatusBoxData extends InheritedWidget {
 
 class StatusBox extends StatelessWidget {
   final List<String> proficiencies;
-  final String attr;
-  const StatusBox({Key? key, required this.proficiencies, required this.attr})
-      : super(key: key);
+  const StatusBox({Key? key, required this.proficiencies}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,7 @@ class StatusBox extends StatelessWidget {
       direction: Axis.horizontal,
       children: [
         Atributes(
-          attr: attr,
+          attr: StatusBoxData.of(context)!.attr,
         ),
         Proficiencies(proficiencies: proficiencies),
       ],
@@ -107,6 +108,8 @@ class _ProficiencieLineState extends State<ProficiencieLine> {
 
   @override
   Widget build(BuildContext context) {
+    final StatusController controller = StatusBoxData.of(context)!.controller;
+    final String attr = StatusBoxData.of(context)!.attr;
     return SizedBox(
       height: 25,
       child: Row(
@@ -119,13 +122,21 @@ class _ProficiencieLineState extends State<ProficiencieLine> {
               value: state,
               onChanged: (s) {
                 setState(() {
-                  state = s!;
+                  state = s ?? false;
                 });
               }),
           Padding(
-            padding: const EdgeInsets.only(left: 8.0, bottom: 3),
+            padding: const EdgeInsets.only(bottom: 3, right: 2),
             child: Text(widget.proficiency),
-          )
+          ),
+          Observer(builder: (_) {
+            return Text(
+                (((controller.status[attr] ?? 10) - 10) ~/ 2).toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    backgroundColor: Color.fromARGB(40, 255, 255, 255),
+                    fontSize: 10));
+          })
         ],
       ),
     );

@@ -72,7 +72,8 @@ class _TextInputBoxState extends State<TextInputBox> {
         filled: widget.filled,
         border: const OutlineInputBorder(borderSide: BorderSide.none),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderSide:
+              BorderSide(color: Color.fromARGB(157, 244, 67, 54), width: 2),
         ),
       ),
       textAlign: TextAlign.center,

@@ -1,30 +1,31 @@
+import 'package:ficha/atributes/status_controller/StatusController.dart';
 import 'package:flutter/material.dart';
-
-import '../center_panel/controllers/status_controller/StatusController.dart';
 import 'status-box.dart';
 
 class StatusList extends StatelessWidget {
-  final StatusController controller;
-  const StatusList({super.key, required this.controller});
+  final StatusController statusController;
+  const StatusList({super.key, required this.statusController});
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
       StatusBoxData(
-          controller: controller,
-          child:
-              const StatusBox(attr: 'Strenght', proficiencies: ['Atletics'])),
+          attr: 'Strength',
+          controller: statusController,
+          child: const StatusBox(proficiencies: ['Atletics'])),
       StatusBoxData(
-          controller: controller,
+          attr: 'Dexterity',
+          controller: statusController,
           child: const StatusBox(
-              attr: 'Dexterity',
               proficiencies: ['Acrobatics', 'Sneaky', 'Sleight of hands'])),
       StatusBoxData(
-          controller: controller,
-          child: const StatusBox(attr: 'Constitution', proficiencies: [])),
+          controller: statusController,
+          attr: 'Constitution',
+          child: const StatusBox(proficiencies: [])),
       StatusBoxData(
-          controller: controller,
-          child: const StatusBox(attr: 'Inteligence', proficiencies: [
+          controller: statusController,
+          attr: 'Intelligence',
+          child: const StatusBox(proficiencies: [
             'Arcana',
             'History',
             'Investigation',
@@ -32,8 +33,9 @@ class StatusList extends StatelessWidget {
             'Religion'
           ])),
       StatusBoxData(
-          controller: controller,
-          child: const StatusBox(attr: 'Wisdom', proficiencies: [
+          controller: statusController,
+          attr: 'Wisdom',
+          child: const StatusBox(proficiencies: [
             'Intuition',
             'Animal Handling',
             'Medicine',
@@ -41,8 +43,9 @@ class StatusList extends StatelessWidget {
             'Survival'
           ])),
       StatusBoxData(
-          controller: controller,
-          child: const StatusBox(attr: 'Charism', proficiencies: [
+          controller: statusController,
+          attr: 'Charisma',
+          child: const StatusBox(proficiencies: [
             'Performance',
             'Deception',
             'Intimidation',

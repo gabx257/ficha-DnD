@@ -58,6 +58,18 @@ mixin _$DropDownSelectionController on _DropDownSelectionControllerBase, Store {
   }
 
   @override
+  void remove(String item) {
+    final _$actionInfo = _$_DropDownSelectionControllerBaseActionController
+        .startAction(name: '_DropDownSelectionControllerBase.remove');
+    try {
+      return super.remove(item);
+    } finally {
+      _$_DropDownSelectionControllerBaseActionController
+          .endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 value: ${value},
