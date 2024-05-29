@@ -1,26 +1,33 @@
+import 'package:ficha/core/notifiers/current_loaded_data.dart';
+import 'package:ficha/core/notifiers/description_drawer.dart';
+import 'package:ficha/core/notifiers/dropdown_selection.dart';
+import 'package:ficha/core/singletons/singletons.dart';
 import 'package:ficha/core/textinput.dart';
-import 'package:ficha/right_panel/top-right-panel.dart';
+import 'package:ficha/right_panel/top_right_panel.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'atributes/status_list.dart';
 import 'atributes/status_controller/status_controller.dart';
 import 'bottom_panel/bottom_row.dart';
 import 'center_panel/center_panel.dart';
-import 'core/ListSelector.dart';
-import 'package:flutter_modular/flutter_modular.dart';
-import 'core/controllers/drawercontroller/drawercontroller.dart';
+import 'core/list_selector.dart';
 import 'models/Character.dart';
-import 'modular.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(ModularApp(
-      module: LoadModule(),
-      child: MaterialApp.router(
-          scrollBehavior: MyCustomScrollBehavior(),
-          routeInformationParser: Modular.routeInformationParser,
-          routerDelegate: Modular.routerDelegate,
-          theme: ThemeData.dark(useMaterial3: true))));
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => DropDownSelectionNotifier()),
+      ChangeNotifierProvider(create: (context) => DescriptionDrawerNotifier()),
+      ChangeNotifierProvider(create: (context) => CurrentLoadedData()),
+      Provider(create: (context) => Singletons()),
+    ],
+    child: MaterialApp(
+        home: const MainPage(),
+        scrollBehavior: MyCustomScrollBehavior(),
+        theme: ThemeData.dark(useMaterial3: true)),
+  ));
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
@@ -31,35 +38,31 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
       };
 }
 
-class MainPage extends StatefulWidget {
+class MainPage extends StatelessWidget {
   const MainPage({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  final drawerController = Modular.get<DescriptionDrawerController>();
-  final StatusController statusController = StatusController();
-  final ScrollController scrollController = ScrollController();
-  final CharacterList characterList = Modular.get<CharacterList>();
   @override
   Widget build(BuildContext context) {
+    final statusController = StatusController();
+
+    final scrollController = ScrollController();
+
     return Scaffold(
         endDrawerEnableOpenDragGesture: false,
         drawer: Drawer(
           child: IconButton(
             onPressed: () {
-              Modular.get<Character>().replaceFromOther(Character(name: "JJ"));
+              context.watch<CurrentLoadedData>().character =
+                  Character(name: "JJ");
             },
             icon: const Icon(Icons.arrow_back),
           ),
         ),
-        endDrawer: Drawer(
+        endDrawer: const Drawer(
           width: 400,
-          child: DescriptionDrawer(controller: drawerController),
+          child: DescriptionDrawer(),
         ),
         appBar: AppBar(
           actions: [Container()],
@@ -101,10 +104,10 @@ class CharacterInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: const [
+        children: [
           Text("Nome:  "),
           CharacterInfoBox(),
           SizedBox(
@@ -161,29 +164,5 @@ class CharacterInfoBox extends StatelessWidget {
         child: const TextInputBox(
           filter: [],
         ));
-  }
-}
-
-class Loading extends StatefulWidget {
-  const Loading({super.key});
-
-  @override
-  State<Loading> createState() => _LoadingState();
-}
-
-class _LoadingState extends State<Loading> {
-  @override
-  void initState() {
-    super.initState();
-    Modular.isModuleReady<LoadModule>().then((r) {
-      Modular.to.navigate("/main/");
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: const CircularProgressIndicator(),
-    );
   }
 }

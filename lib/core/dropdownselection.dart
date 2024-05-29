@@ -1,13 +1,11 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:ficha/core/list_selector.dart';
 import 'package:ficha/core/shadowbox.dart';
+import 'package:ficha/core/singletons/singletons.dart';
 import 'package:ficha/core/textinput.dart';
+import 'package:ficha/models/basemodel.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
-
-import '../models/model.dart';
-import '../models/spells.dart';
-import 'ListSelector.dart';
-import 'controllers/dropdownselectioncontroller/dropdownselection_controller.dart';
+import 'package:provider/provider.dart';
 
 class DropDownSelection extends StatelessWidget {
   final String value;
@@ -67,44 +65,19 @@ class DropDownSelection extends StatelessWidget {
   }
 }
 
-class ListingBox<T extends ModelList> extends StatefulWidget {
-  const ListingBox(
-      {super.key,
-      this.title = "",
-      this.controller,
-      this.height = 580,
-      this.width = 600});
-  final DropDownSelectionController? controller;
+class ListingBox<T extends BaseModelsList> extends StatelessWidget {
+  ListingBox({super.key, this.title = "", this.height = 580, this.width = 600});
 
   final String title;
   final double height;
   final double width;
 
-  @override
-  State<ListingBox> createState() => _ListingBoxStateState<T>();
-}
-
-class _ListingBoxStateState<T extends ModelList> extends State<ListingBox> {
-  late final List<Widget> itens;
-  late final DropDownSelectionController controller;
-  final ModelList list = Modular.get<T>();
-  final spells = Modular.get<SpellList>();
-
-  @override
-  void initState() {
-    super.initState();
-    controller = widget.controller ?? DropDownSelectionController();
-    controller.value = "";
-    itens = createList();
-  }
-
-  List<Widget> createList() {
+  List<Widget> createList(T l) {
     List<Widget> list = [];
-    for (var item in controller.items) {
+    for (var item in l) {
       list.add(Item(
-        list: spells,
-        item: item,
-        controller: controller,
+        item: item.name,
+        list: l,
         itens: list,
       ));
     }
@@ -113,20 +86,20 @@ class _ListingBoxStateState<T extends ModelList> extends State<ListingBox> {
 
   @override
   Widget build(BuildContext context) {
+    final T list = context.watch<Singletons>().returnRelevantModel<T>();
     return ShadowBox(
       innerpadding: 0,
-      height: widget.height,
-      width: widget.width,
+      height: height,
+      width: width,
       children: [
         Container(
             color: const Color.fromARGB(68, 105, 101, 101),
-            width: widget.width,
+            width: width,
             height: 40,
             alignment: Alignment.center,
-            child: Text(widget.title, style: const TextStyle(fontSize: 20))),
+            child: Text(title, style: const TextStyle(fontSize: 20))),
         ListSelector(
-          itens: itens,
-          controller: controller,
+          itens: createList(list),
           list: list,
         )
       ],

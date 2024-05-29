@@ -7,23 +7,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'model.dart';
-
-class SpellList extends ModelList<Spell> {
-  final dynamic _spellsJson =
-      jsonDecode(File("assets/spells.json").readAsStringSync());
-  SpellList() {
-    for (Map<String, dynamic> spell in _spellsJson) {
-      add(Spell.fromJson(spell));
-    }
-  }
-  SpellList.Empty();
-}
+import 'package:ficha/models/basemodel.dart';
 
 // Spell is a model that holds all the information about a spell
 // it is used to populate the dropdowns in the SpellList
 // and to get the spell description to be displayed in the DescriptionDrawer
-class Spell extends Model {
+class Spell extends BaseModel {
   final String? page;
   final String? range;
   final String? desc;
@@ -86,5 +75,30 @@ class Spell extends Model {
       school: json['school'],
       classes: json['class'],
     );
+  }
+}
+
+class SpellList extends BaseModelsList<Spell> {
+  static late final SpellList? _instance;
+
+  SpellList() {
+    if (_instance != null) return;
+    final List spellsJson =
+        jsonDecode(File("assets/spells.json").readAsStringSync());
+
+    for (Map<String, dynamic> spell in spellsJson) {
+      add(Spell.fromJson(spell));
+    }
+
+    _instance = this;
+  }
+
+  SpellList.empty() : super.empty();
+
+  static SpellList get fullList {
+    if (_instance == null) {
+      return SpellList();
+    }
+    return _instance!;
   }
 }

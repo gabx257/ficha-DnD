@@ -1,24 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:ficha/models/basemodel.dart';
 import 'package:ficha/models/equipaments.dart';
-import 'package:ficha/models/model.dart';
+
 import 'package:ficha/models/spells.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 
-class CharacterList extends ModelList<Character> {
-  CharacterList() {
-    late Map<String, dynamic> characterJson;
-    for (var characterFile in Directory("assets/saved/").listSync()) {
-      characterJson = jsonDecode(File(characterFile.path).readAsStringSync());
-      add(Character.fromJson(characterJson));
-    }
-  }
-
-  CharacterList.Empty();
-}
-
-class Character extends Model {
+class Character extends BaseModel {
   String? classType;
   int? level;
   String? race;
@@ -52,24 +40,15 @@ class Character extends Model {
     this.spellSlots,
   });
 
-  @override
   factory Character.fromJson(Map<String, dynamic> json) {
-    SpellList characterSpells() {
-      final spellsGlobal = Modular.get<SpellList>();
-      SpellList out = SpellList.Empty();
-      for (String spell in json["spells"]) {
-        out.add(spellsGlobal[spell]);
-      }
-      return out;
-    }
+    EquipmentList equipment = EquipmentList.empty();
+    SpellList spells = SpellList.empty();
 
-    EquipmentList characterEquipaments() {
-      final equipamentsGlobal = Modular.get<EquipmentList>();
-      EquipmentList out = EquipmentList.Empty();
-      for (String equip in json["equipment"]) {
-        out.add(equipamentsGlobal[equip]);
-      }
-      return out;
+    for (String spell in json["spells"]) {
+      spells.add(SpellList.fullList[spell]);
+    }
+    for (String equip in json["equipment"]) {
+      equipment.add(EquipmentList.fullList[equip]);
     }
 
     return Character(
@@ -85,12 +64,13 @@ class Character extends Model {
       speed: json['speed'],
       abilityScores: Map<String, int>.from(json['abilityScores']),
       proficiencies: List<String>.from(json['proficiencies']),
-      equipment: characterEquipaments(),
-      spells: characterSpells(),
+      equipment: equipment,
+      spells: spells,
       spellSlots: Map<String, int>.from(json['spellSlots']),
     );
   }
 
+  @override
   Map<String, dynamic> get toMap => {
         'name': name,
         'class': classType,
@@ -105,14 +85,14 @@ class Character extends Model {
         'abilityScores': abilityScores,
         'proficiencies': proficiencies,
         'equipment': equipment,
-        'spells': spells?.nameList.toString(),
+        'spells': spells?.names.toString(),
         'spellSlots': spellSlots,
       };
 
   void save() =>
       File("assets/saved/$name.json").writeAsStringSync(jsonEncode(toMap));
 
-  void replaceFromOther(covariant Character other) {
+  void replaceFromOther(Character other) {
     name = other.name;
     classType = other.classType;
     level = other.level;
@@ -129,4 +109,16 @@ class Character extends Model {
     spells = other.spells;
     spellSlots = other.spellSlots;
   }
+}
+
+class CharacterList extends BaseModelsList<Character> {
+  CharacterList() {
+    late Map<String, dynamic> characterJson;
+    for (var characterFile in Directory("assets/saved/").listSync()) {
+      characterJson = jsonDecode(File(characterFile.path).readAsStringSync());
+      add(Character.fromJson(characterJson));
+    }
+  }
+
+  CharacterList.empty() : super.empty();
 }

@@ -1,49 +1,40 @@
+import 'package:ficha/core/notifiers/description_drawer.dart';
+import 'package:ficha/core/notifiers/dropdown_selection.dart';
+import 'package:ficha/models/basemodel.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_modular/flutter_modular.dart';
-import '../models/model.dart';
+import 'package:provider/provider.dart';
 import 'Dropdownselection.dart';
-import 'controllers/drawercontroller/drawercontroller.dart';
-import 'controllers/dropdownselectioncontroller/dropdownselection_controller.dart';
 
 class ListSelector extends StatelessWidget {
-  const ListSelector(
-      {super.key,
-      required this.itens,
-      required this.controller,
-      required this.list});
+  const ListSelector({super.key, required this.itens, required this.list});
 
   final List<Widget> itens;
-  final DropDownSelectionController controller;
-  final ModelList list;
+
+  final BaseModelsList list;
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<DropDownSelectionNotifier>();
     return Expanded(
-      child: Observer(builder: (_) {
-        controller.items.length;
-        return Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
-          child: ListView(children: [
-            ...itens,
-            ControlInterface(
-              itemList: list,
-              value: "choose an item",
-              onChanged: (v) {
-                if (v == null) return;
-                itens.add(Item(
-                  list: list,
-                  item: v,
-                  controller: controller,
-                  itens: itens,
-                ));
-                controller.add(v);
-              },
-            )
-          ]),
-        );
-      }),
-    );
+        child: Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+      child: ListView(children: [
+        ...itens,
+        ControlInterface(
+          itemList: list,
+          value: "choose an item",
+          onChanged: (v) {
+            if (v == null) return;
+            itens.add(Item(
+              list: list,
+              item: v,
+              itens: itens,
+            ));
+            controller.add(v);
+          },
+        )
+      ]),
+    ));
   }
 }
 
@@ -55,19 +46,16 @@ class ListSelector extends StatelessWidget {
 // it is used by the InventoryControlInterface widget
 class Item extends StatelessWidget {
   const Item(
-      {super.key,
-      required this.item,
-      required this.controller,
-      required this.itens,
-      required this.list});
-  final DropDownSelectionController controller;
+      {super.key, required this.item, required this.itens, required this.list});
+
   final String item;
   final List<Widget> itens;
-  final ModelList list;
+  final BaseModelsList list;
 
   @override
   Widget build(BuildContext context) {
-    final drawerController = Modular.get<DescriptionDrawerController>();
+    final dropDownState = context.watch<DropDownSelectionNotifier>();
+    final drawerState = context.watch<DescriptionDrawerNotifier>();
     return Container(
       padding: const EdgeInsets.only(left: 15),
       alignment: Alignment.centerLeft,
@@ -89,7 +77,7 @@ class Item extends StatelessWidget {
           ),
           IconButton(
               onPressed: () {
-                drawerController.info = list[item];
+                drawerState.info = list[item];
                 Scaffold.of(context).openEndDrawer();
               },
               icon: const Icon(Icons.help_outline_sharp)),
@@ -97,7 +85,7 @@ class Item extends StatelessWidget {
           IconButton(
               onPressed: () {
                 itens.remove(this);
-                controller.remove(item);
+                dropDownState.remove(item);
               },
               icon: const Icon(Icons.remove_circle_outline_sharp))
         ],
@@ -112,7 +100,7 @@ class Item extends StatelessWidget {
 // it has a button to cancel the add operation
 // it is used by the Inventory widget
 class ControlInterface extends StatefulWidget {
-  final ModelList itemList;
+  final BaseModelsList itemList;
   final void Function(String?) onChanged;
   final String value;
   const ControlInterface(
@@ -126,11 +114,6 @@ class ControlInterface extends StatefulWidget {
 }
 
 class _ControlInterfaceState extends State<ControlInterface> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   bool isEditing = false;
 
   @override
@@ -148,7 +131,7 @@ class _ControlInterfaceState extends State<ControlInterface> {
       children: [
         DropDownSelection(
           value: widget.value,
-          items: widget.itemList.names,
+          items: widget.itemList.names.toList(),
           onChanged: widget.onChanged,
         ),
         IconButton(
@@ -163,19 +146,18 @@ class _ControlInterfaceState extends State<ControlInterface> {
 // DescriptionDrawer is a widget that update the info of an item
 // to be displayed on the info drawer
 // it is used by the InventoryItem widget
-class DescriptionDrawer<T extends Model> extends StatelessWidget {
-  final DescriptionDrawerController controller;
-  const DescriptionDrawer({super.key, required this.controller});
+class DescriptionDrawer<T extends BaseModel> extends StatelessWidget {
+  const DescriptionDrawer({super.key});
 
   // function build List of TextSpan
   // create a List of TextSpan to be used on the RichText Widget
   // loop though controller.info atributtes
   // considering that controller.info is of type T
   // and make a TextSpan for each one
-  List<TextSpan> buildTextSpanList() {
-    controller.info = controller.info as T;
+  List<TextSpan> buildTextSpanList(DescriptionDrawerNotifier state) {
+    state.info = state.info as T;
     List<TextSpan> list = [];
-    for (MapEntry<String, dynamic> item in controller.info.iterator) {
+    for (MapEntry<String, dynamic> item in state.info.iterator) {
       list.addAll([
         TextSpan(
             text: "${item.key}: ",
@@ -197,14 +179,13 @@ class DescriptionDrawer<T extends Model> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(builder: (_) {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: RichText(
-            text: TextSpan(
-          children: buildTextSpanList(),
-        )),
-      );
-    });
+    final state = context.watch<DescriptionDrawerNotifier>();
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: RichText(
+          text: TextSpan(
+        children: buildTextSpanList(state),
+      )),
+    );
   }
 }

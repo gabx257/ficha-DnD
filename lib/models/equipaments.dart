@@ -3,34 +3,45 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'model.dart';
+import 'package:ficha/models/basemodel.dart';
 
 // EquipmentList is a singleton class that holds all equipment
 // it is used to populate the dropdowns in the EquipmentList
 // and to get the equipment description to be displayed in the DescriptionDrawer
-class EquipmentList extends ModelList<Equipament> {
+class EquipmentList extends BaseModelsList<Equipment> {
+  static late final EquipmentList? _instance;
   EquipmentList() {
+    if (_instance != null) return;
     final List equipamentJson =
         jsonDecode(File("assets/equipaments.json").readAsStringSync());
     for (Map<String, dynamic> equipament in equipamentJson) {
-      add(Equipament.fromJson(equipament));
+      add(Equipment.fromJson(equipament));
     }
+
+    _instance = this;
   }
 
-  EquipmentList.Empty();
+  EquipmentList.empty() : super.empty();
+
+  static EquipmentList get fullList {
+    if (_instance == null) {
+      return EquipmentList();
+    }
+    return _instance!;
+  }
 }
 
 // Equipment is a model that holds all the information about a equipment
 // it is used to populate the dropdowns in the EquipmentList
 // and to get the equipment description to be displayed in the DescriptionDrawer
-class Equipament extends Model {
+class Equipment extends BaseModel {
   final String? cost;
   final String? weight;
   final String? category;
   final String? properties;
   final String? desc;
 
-  Equipament({
+  Equipment({
     required super.name,
     this.cost,
     this.weight,
@@ -39,18 +50,8 @@ class Equipament extends Model {
     this.desc,
   });
 
-  @override
-  Map<String, dynamic> get toMap => {
-        'name': name,
-        'cost': cost,
-        'weight': weight,
-        'category': category,
-        'properties': properties,
-        'desc': desc,
-      };
-
-  factory Equipament.fromJson(Map<String, dynamic> json) {
-    String mountprop() {
+  factory Equipment.fromJson(Map<String, dynamic> json) {
+    String mountproperties() {
       String prop = "";
       if (json['properties'] == null) return prop;
       for (Map property in json['properties']) {
@@ -69,7 +70,7 @@ class Equipament extends Model {
         armor_category: json['armor_category'],
         armor_class: json['armor_class']['base'].toString(),
         stealth_disadvantage: json['stealth_disadvantage'].toString(),
-        properties: mountprop(),
+        properties: mountproperties(),
         armor_str_minimum: json['str_minimum']?.toString(),
         dex_bonus: json['armor_class']['dex_bonus']?.toString(),
         max_bonus: json['armor_class']['max_bonus']?.toString(),
@@ -82,7 +83,7 @@ class Equipament extends Model {
         cost: "${json['cost']['quantity']} ${json['cost']['unit']}",
         weight: json['weight'].toString(),
         category: json['equipment_category']['name'],
-        properties: mountprop(),
+        properties: mountproperties(),
         damage: json['damage']?['damage_dice'],
         weapon_range: json['weapon_range'],
         weapon_category: json['weapon_category'],
@@ -92,21 +93,31 @@ class Equipament extends Model {
         damage_type: json['damage']?['damage_type']['name'],
       );
     }
-    return Equipament(
+    return Equipment(
       name: json['name'],
       cost: "${json['cost']['quantity']} ${json['cost']['unit']}",
       weight: json['weight'].toString(),
       category: json['equipment_category']['name'],
-      properties: mountprop(),
+      properties: mountproperties(),
       desc: json['desc']?.join(''),
     );
   }
+
+  @override
+  Map<String, dynamic> get toMap => {
+        'name': name,
+        'cost': cost,
+        'weight': weight,
+        'category': category,
+        'properties': properties,
+        'desc': desc,
+      };
 }
 
 // Weapon is a model that holds all the information about a weapon
 // it extends Equipment
 // but has additional properties
-class Weapon extends Equipament {
+class Weapon extends Equipment {
   final String? damage;
   final String? weapon_range;
   final String? weapon_category;
@@ -177,7 +188,7 @@ class Weapon extends Equipament {
 // Armor is a model that holds all the information about a armor
 // it extends Equipment
 // but has additional properties specific to armor from equipment.json
-class Armor extends Equipament {
+class Armor extends Equipment {
   final String? armor_class;
   final String? armor_category;
   final String? armor_str_minimum;
