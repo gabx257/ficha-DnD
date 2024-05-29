@@ -1,19 +1,23 @@
+// ignore_for_file: non_constant_identifier_names
+
 // SpellList is a singleton class that holds all spells
 // it is used to populate the dropdowns in the SpellList
 // and to get the spell description to be displayed in the DescriptionDrawer
+
 import 'dart:convert';
 import 'dart:io';
 
 import 'model.dart';
 
 class SpellList extends ModelList<Spell> {
-  final List _spellsJson =
+  final dynamic _spellsJson =
       jsonDecode(File("assets/spells.json").readAsStringSync());
   SpellList() {
     for (Map<String, dynamic> spell in _spellsJson) {
       add(Spell.fromJson(spell));
     }
   }
+  SpellList.Empty();
 }
 
 // Spell is a model that holds all the information about a spell
@@ -35,18 +39,18 @@ class Spell extends Model {
 
   Spell({
     required super.name,
-    required this.desc,
-    required this.page,
-    required this.range,
-    required this.components,
-    required this.material,
-    required this.ritual,
-    required this.duration,
-    required this.concentration,
-    required this.casting_time,
-    required this.level,
-    required this.school,
-    required this.classes,
+    this.desc,
+    this.page,
+    this.range,
+    this.components,
+    this.material,
+    this.ritual,
+    this.duration,
+    this.concentration,
+    this.casting_time,
+    this.level,
+    this.school,
+    this.classes,
   });
 
   @override

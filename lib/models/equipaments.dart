@@ -8,32 +8,34 @@ import 'model.dart';
 // EquipmentList is a singleton class that holds all equipment
 // it is used to populate the dropdowns in the EquipmentList
 // and to get the equipment description to be displayed in the DescriptionDrawer
-class EquipmentList extends ModelList<Equipment> {
-  final List _equipamentJson =
-      jsonDecode(File("assets/equipaments.json").readAsStringSync());
+class EquipmentList extends ModelList<Equipament> {
   EquipmentList() {
-    for (Map<String, dynamic> equipament in _equipamentJson) {
-      add(Equipment.fromJson(equipament));
+    final List equipamentJson =
+        jsonDecode(File("assets/equipaments.json").readAsStringSync());
+    for (Map<String, dynamic> equipament in equipamentJson) {
+      add(Equipament.fromJson(equipament));
     }
   }
+
+  EquipmentList.Empty();
 }
 
 // Equipment is a model that holds all the information about a equipment
 // it is used to populate the dropdowns in the EquipmentList
 // and to get the equipment description to be displayed in the DescriptionDrawer
-class Equipment extends Model {
+class Equipament extends Model {
   final String? cost;
   final String? weight;
   final String? category;
   final String? properties;
   final String? desc;
 
-  Equipment({
+  Equipament({
     required super.name,
-    required this.cost,
-    required this.weight,
-    required this.category,
-    required this.properties,
+    this.cost,
+    this.weight,
+    this.category,
+    this.properties,
     this.desc,
   });
 
@@ -47,7 +49,7 @@ class Equipment extends Model {
         'desc': desc,
       };
 
-  factory Equipment.fromJson(Map<String, dynamic> json) {
+  factory Equipament.fromJson(Map<String, dynamic> json) {
     String mountprop() {
       String prop = "";
       if (json['properties'] == null) return prop;
@@ -90,7 +92,7 @@ class Equipment extends Model {
         damage_type: json['damage']?['damage_type']['name'],
       );
     }
-    return Equipment(
+    return Equipament(
       name: json['name'],
       cost: "${json['cost']['quantity']} ${json['cost']['unit']}",
       weight: json['weight'].toString(),
@@ -104,7 +106,7 @@ class Equipment extends Model {
 // Weapon is a model that holds all the information about a weapon
 // it extends Equipment
 // but has additional properties
-class Weapon extends Equipment {
+class Weapon extends Equipament {
   final String? damage;
   final String? weapon_range;
   final String? weapon_category;
@@ -115,17 +117,17 @@ class Weapon extends Equipment {
 
   Weapon({
     required super.name,
-    required super.cost,
-    required super.weight,
-    required super.category,
-    required super.properties,
-    required this.damage,
-    required this.weapon_range,
-    required this.weapon_category,
-    required this.two_handed_damage,
-    required this.weapon_range_long,
-    required this.normal_range,
-    required this.damage_type,
+    super.cost,
+    super.weight,
+    super.category,
+    super.properties,
+    this.damage,
+    this.weapon_range,
+    this.weapon_category,
+    this.two_handed_damage,
+    this.weapon_range_long,
+    this.normal_range,
+    this.damage_type,
   });
 
   @override
@@ -175,7 +177,7 @@ class Weapon extends Equipment {
 // Armor is a model that holds all the information about a armor
 // it extends Equipment
 // but has additional properties specific to armor from equipment.json
-class Armor extends Equipment {
+class Armor extends Equipament {
   final String? armor_class;
   final String? armor_category;
   final String? armor_str_minimum;
@@ -185,16 +187,16 @@ class Armor extends Equipment {
 
   Armor({
     required super.name,
-    required super.cost,
-    required super.weight,
-    required super.category,
-    required super.properties,
-    required this.armor_class,
-    required this.armor_category,
-    required this.armor_str_minimum,
-    required this.stealth_disadvantage,
-    required this.dex_bonus,
-    required this.max_bonus,
+    super.cost,
+    super.weight,
+    super.category,
+    super.properties,
+    this.armor_class,
+    this.armor_category,
+    this.armor_str_minimum,
+    this.stealth_disadvantage,
+    this.dex_bonus,
+    this.max_bonus,
   });
 
   @override

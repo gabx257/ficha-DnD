@@ -1,9 +1,9 @@
 import 'package:ficha/center_panel/top_panel/centertop_panel.dart';
-import 'package:ficha/main.dart';
+import 'package:ficha/core/dropdownselection.dart';
 import 'package:flutter/material.dart';
 
-import '../atributes/status_controller/StatusController.dart';
-import 'attacks.dart';
+import '../atributes/status_controller/status_controller.dart';
+import '../models/spells.dart';
 
 class CenterColumn extends StatelessWidget {
   const CenterColumn({
@@ -23,8 +23,7 @@ class CenterColumn extends StatelessWidget {
           CenterTopPanel(
             controller: controller,
           ),
-          AttackList(
-            list: spells,
+          const ListingBox<SpellList>(
             title: "Attack",
           )
         ],

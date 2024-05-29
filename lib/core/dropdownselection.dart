@@ -2,9 +2,10 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:ficha/core/shadowbox.dart';
 import 'package:ficha/core/textinput.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
-import '../main.dart';
 import '../models/model.dart';
+import '../models/spells.dart';
 import 'ListSelector.dart';
 import 'controllers/dropdownselectioncontroller/dropdownselection_controller.dart';
 
@@ -16,8 +17,6 @@ class DropDownSelection extends StatelessWidget {
 
   DropDownSelection(
       {super.key, required this.value, required this.items, this.onChanged});
-
-  //regex for words only
 
   @override
   Widget build(BuildContext context) {
@@ -68,27 +67,28 @@ class DropDownSelection extends StatelessWidget {
   }
 }
 
-class ListingBox extends StatefulWidget {
+class ListingBox<T extends ModelList> extends StatefulWidget {
   const ListingBox(
       {super.key,
-      required this.list,
       this.title = "",
       this.controller,
       this.height = 580,
       this.width = 600});
   final DropDownSelectionController? controller;
-  final ModelList list;
+
   final String title;
   final double height;
   final double width;
 
   @override
-  State<ListingBox> createState() => _ListingBoxStateState();
+  State<ListingBox> createState() => _ListingBoxStateState<T>();
 }
 
-class _ListingBoxStateState extends State<ListingBox> {
+class _ListingBoxStateState<T extends ModelList> extends State<ListingBox> {
   late final List<Widget> itens;
   late final DropDownSelectionController controller;
+  final ModelList list = Modular.get<T>();
+  final spells = Modular.get<SpellList>();
 
   @override
   void initState() {
@@ -127,7 +127,7 @@ class _ListingBoxStateState extends State<ListingBox> {
         ListSelector(
           itens: itens,
           controller: controller,
-          list: widget.list,
+          list: list,
         )
       ],
     );

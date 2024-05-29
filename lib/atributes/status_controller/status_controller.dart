@@ -1,5 +1,5 @@
 import 'package:mobx/mobx.dart';
-part 'StatusController.g.dart';
+part 'status_controller.g.dart';
 
 class StatusController = _StatusControllerBase with _$StatusController;
 

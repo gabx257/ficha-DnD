@@ -1,11 +1,12 @@
-import 'package:ficha/atributes/status_controller/StatusController.dart';
-import 'package:ficha/main.dart';
-import 'package:ficha/right_panel/inventory.dart';
+import 'package:ficha/atributes/status_controller/status_controller.dart';
+import 'package:ficha/core/dropdownselection.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 import '../core/controllers/dropdownselectioncontroller/dropdownselection_controller.dart';
 import '../core/shadowbox.dart';
+import '../models/equipaments.dart';
 
 class RightPanelData extends InheritedWidget {
   final StatusController statusController;
@@ -37,15 +38,14 @@ class RightPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return RightPanelData(
       statusController: statusController,
-      child: Column(children: [
-        const TopRightPanel(),
-        const ShadowBox(
+      child: Column(children: const [
+        TopRightPanel(),
+        ShadowBox(
           height: 180,
           width: 600,
           children: [Text("conjuration")],
         ),
-        Inventory(
-          list: equipments,
+        ListingBox<EquipmentList>(
           title: "Inventory",
         ),
       ]),

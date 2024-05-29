@@ -1,7 +1,7 @@
 import 'package:ficha/core/dropdownselection.dart';
 import 'package:flutter/material.dart';
 
-import '../main.dart';
+import '../models/spells.dart';
 
 class BottomRow extends StatelessWidget {
   const BottomRow({
@@ -11,10 +11,9 @@ class BottomRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        Abilities(list: spells, title: "Abilities"),
+      children: const [
+        Abilities(title: "Abilities"),
         ToolsEProficiencies(
-          list: spells,
           title: "Tools & Proficiencies",
         )
       ],
@@ -22,20 +21,18 @@ class BottomRow extends StatelessWidget {
   }
 }
 
-class Abilities extends ListingBox {
+class Abilities extends ListingBox<SpellList> {
   const Abilities(
       {super.key,
-      required super.list,
       super.title,
       super.controller,
       super.height = 300,
       super.width = 725});
 }
 
-class ToolsEProficiencies extends ListingBox {
+class ToolsEProficiencies extends ListingBox<SpellList> {
   const ToolsEProficiencies(
       {super.key,
-      required super.list,
       super.title,
       super.controller,
       super.height = 300,

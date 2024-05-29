@@ -3,11 +3,12 @@
 // base class for all models
 // all models must inherit from this class
 // to be used with the DescriptionDrawer
+
 class Model {
   String name;
 
   Model({
-    required this.name,
+    this.name = "",
   });
 
   String operator [](String name) {
@@ -58,7 +59,8 @@ abstract class ModelList<T extends Model> {
   }
 
   int get length => _list.length;
+
+  List<String> get nameList => _list.map((e) => e.name).toList();
+
+  Iterable<T> get iterator => _list;
 }
-/// to-do:
-/// - add model for Magic Items
-/// - add damage types to weapons and spells 

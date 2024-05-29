@@ -1,0 +1,41 @@
+{
+    "name": "Gandalf",
+    "class": "Wizard",
+    "level": 10,
+    "race": "Maia",
+    "alignment": "Neutral Good",
+    "background": "Sage",
+    "armorClass": 16,
+    "hitPoints": 70,
+    "hitDice": "10d6",
+    "speed": 30,
+    "abilityScores": {
+        "strength": 10,
+        "dexterity": 14,
+        "constitution": 12,
+        "intelligence": 20,
+        "wisdom": 16,
+        "charisma": 12
+    },
+    "proficiencies": [
+        "Arcana",
+        "History",
+        "Insight",
+        "Investigation",
+        "Medicine"
+    ],
+    "equipment": [
+        "Staff of Power",
+        "Ring of Spell Turning",
+        "Spellbook",
+        "Robes of the Archmagi"
+    ],
+    "spells": "[Fireball, Lightning Bolt, Magic Missile, Counterspell, Wall of Force]",
+    "spellSlots": {
+        "1stLevel": 4,
+        "2ndLevel": 3,
+        "3rdLevel": 3,
+        "4thLevel": 2,
+        "5thLevel": 1
+    }
+}

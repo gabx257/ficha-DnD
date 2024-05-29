@@ -2,7 +2,7 @@ import 'package:ficha/center_panel/top_panel/top_panel_containers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
-import '../../atributes/status_controller/StatusController.dart';
+import '../../atributes/status_controller/status_controller.dart';
 import '../../core/shadowbox.dart';
 import '../controllers/health_controler/health_controler.dart';
 import '../controllers/hitdie_controler/hitdie_controler.dart';

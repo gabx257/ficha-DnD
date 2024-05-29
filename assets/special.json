@@ -1,0 +1,73 @@
+{
+    "specialResources": {
+        "Barbarian": {
+            "rage": 0,
+            "recklessAttack": 0,
+            "dangerSense": 0
+        },
+        "Bard": {
+            "bardicInspiration": [],
+            "jackOfAllTrades": true,
+            "songOfRest": true,
+            "expertise": []
+        },
+        "Cleric": {
+            "channelDivinity": 0,
+            "divineIntervention": 0,
+            "destroyUndead": []
+        },
+        "Druid": {
+            "wildShape": 0,
+            "landStride": true,
+            "natureSense": true,
+            "timelessBody": true,
+            "beastSpells": []
+        },
+        "Fighter": {
+            "actionSurge": 0,
+            "secondWind": 0,
+            "extraAttacks": true
+        },
+        "Monk": {
+            "kiPoints": 0,
+            "unarmoredMovement": true,
+            "deflectMissiles": 0,
+            "slowFall": true,
+            "stunningStrike": 0
+        },
+        "Paladin": {
+            "layOnHands": 0,
+            "divineSmite": true,
+            "auraOfProtection": true,
+            "auraOfCourage": true
+        },
+        "Ranger": {
+            "favoredEnemy": [],
+            "naturalExplorer": true,
+            "primevalAwareness": 0,
+            "landStryder": true
+        },
+        "Rogue": {
+            "sneakAttack": true,
+            "thievesCant": true,
+            "cunningAction": true,
+            "uncannyDodge": 0,
+            "evasion": true,
+            "reliableTalent": true,
+            "blindSense": true,
+            "slipperyMind": 0
+        },
+        "Sorcerer": {
+            "sorceryPoints": 0,
+            "metamagic": []
+        },
+        "Warlock": {
+            "pactMagic": true,
+            "invocations": []
+        },
+        "Wizard": {
+            "arcaneRecovery": true,
+            "signatureSpells": []
+        }
+    }
+}

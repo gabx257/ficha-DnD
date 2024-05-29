@@ -1,4 +1,3 @@
-import 'package:ficha/main.dart';
 import 'package:mobx/mobx.dart';
 
 import '../../../models/model.dart';
@@ -9,5 +8,5 @@ class DescriptionDrawerController = _DescriptionDrawerControllerBase
 
 abstract class _DescriptionDrawerControllerBase with Store {
   @observable
-  Model info = spells[0];
+  Model info = Model(name: "nothing to show");
 }

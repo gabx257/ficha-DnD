@@ -1,4 +1,4 @@
-import 'package:ficha/atributes/status_controller/StatusController.dart';
+import 'package:ficha/atributes/status_controller/status_controller.dart';
 import 'package:ficha/core/shadowbox.dart';
 import 'package:ficha/core/textinput.dart';
 import 'package:flutter/material.dart';

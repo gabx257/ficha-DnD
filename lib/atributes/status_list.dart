@@ -1,6 +1,6 @@
-import 'package:ficha/atributes/status_controller/StatusController.dart';
+import 'package:ficha/atributes/status_controller/status_controller.dart';
 import 'package:flutter/material.dart';
-import 'status-box.dart';
+import 'status_box.dart';
 
 class StatusList extends StatelessWidget {
   final StatusController statusController;

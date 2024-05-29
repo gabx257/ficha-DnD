@@ -16,6 +16,7 @@ dependencies:
   mobx: ^2.1.4
   flutter_mobx: ^2.0.6+5
   dropdown_button2: ^2.1.0
+  flutter_modular: ^5.0.3
 
 dev_dependencies:
   flutter_test:

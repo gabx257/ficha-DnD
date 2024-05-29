@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-
-import '../main.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import '../models/model.dart';
 import 'Dropdownselection.dart';
 import 'controllers/drawercontroller/drawercontroller.dart';
@@ -68,6 +67,7 @@ class Item extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final drawerController = Modular.get<DescriptionDrawerController>();
     return Container(
       padding: const EdgeInsets.only(left: 15),
       alignment: Alignment.centerLeft,
