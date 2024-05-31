@@ -1,31 +1,14 @@
-import 'package:ficha/atributes/status_controller/status_controller.dart';
+import 'package:ficha/atributes/notifiers/status.dart';
+import 'package:ficha/core/checkbox.dart';
 import 'package:ficha/core/shadowbox.dart';
 import 'package:ficha/core/textinput.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-
-class StatusBoxData extends InheritedWidget {
-  final StatusController controller;
-  final String attr;
-  const StatusBoxData(
-      {super.key,
-      required super.child,
-      required this.controller,
-      required this.attr});
-
-  @override
-  bool updateShouldNotify(covariant StatusBoxData oldWidget) {
-    return oldWidget.controller != controller;
-  }
-
-  static StatusBoxData? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<StatusBoxData>();
-  }
-}
+import 'package:provider/provider.dart';
 
 class StatusBox extends StatelessWidget {
   final List<String> proficiencies;
-  const StatusBox({Key? key, required this.proficiencies}) : super(key: key);
+  final String attr;
+  const StatusBox({super.key, required this.proficiencies, required this.attr});
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +20,9 @@ class StatusBox extends StatelessWidget {
       direction: Axis.horizontal,
       children: [
         Atributes(
-          attr: StatusBoxData.of(context)!.attr,
+          attr: attr,
         ),
-        Proficiencies(proficiencies: proficiencies),
+        Proficiencies(proficiencies: proficiencies, attr: attr),
       ],
     );
   }
@@ -51,8 +34,7 @@ class Atributes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final StatusController controller =
-        StatusBoxData.of(context)?.controller ?? StatusController();
+    final StatusNotifier status = context.watch<StatusNotifier>();
     return ShadowBox(
       padding: 5,
       mainAxis: MainAxisAlignment.spaceAround,
@@ -62,8 +44,7 @@ class Atributes extends StatelessWidget {
         Flexible(
           flex: 70,
           child: TextInputBox(
-            onChanged: (event) =>
-                controller.status[attr] = int.tryParse(event) ?? 10,
+            onChanged: (event) => status.status[attr] = int.tryParse(event)!,
             filled: true,
           ),
         ),
@@ -79,13 +60,11 @@ class Atributes extends StatelessWidget {
                 borderRadius: const BorderRadius.all(Radius.elliptical(60, 35)),
                 color: Colors.white),
             child: Center(
-              child: Observer(builder: (_) {
-                return Text(
-                  (((controller.status[attr] ?? 10) - 10) ~/ 2).toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.black),
-                );
-              }),
+              child: Text(
+                ((status.status[attr]! - 10) ~/ 2).toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black),
+              ),
             ),
           ),
         )
@@ -94,49 +73,29 @@ class Atributes extends StatelessWidget {
   }
 }
 
-class ProficiencieLine extends StatefulWidget {
-  const ProficiencieLine({Key? key, required this.proficiency})
-      : super(key: key);
+class ProficiencieLine extends StatelessWidget {
+  const ProficiencieLine(
+      {super.key, required this.proficiency, required this.attr});
   final String proficiency;
-
-  @override
-  State<ProficiencieLine> createState() => _ProficiencieLineState();
-}
-
-class _ProficiencieLineState extends State<ProficiencieLine> {
-  bool state = false;
+  final String attr;
 
   @override
   Widget build(BuildContext context) {
-    final StatusController controller = StatusBoxData.of(context)!.controller;
-    final String attr = StatusBoxData.of(context)!.attr;
+    final StatusNotifier status = context.watch<StatusNotifier>();
     return SizedBox(
       height: 25,
       child: Row(
         children: [
-          Checkbox(
-              activeColor: const Color.fromARGB(255, 23, 71, 191),
-              checkColor: Colors.white,
-              splashRadius: 7,
-              shape: const CircleBorder(),
-              value: state,
-              onChanged: (s) {
-                setState(() {
-                  state = s ?? false;
-                });
-              }),
+          const CustomCheckBox(value: false),
           Padding(
             padding: const EdgeInsets.only(bottom: 3, right: 2),
-            child: Text(widget.proficiency),
+            child: Text(proficiency),
           ),
-          Observer(builder: (_) {
-            return Text(
-                (((controller.status[attr] ?? 10) - 10) ~/ 2).toString(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    backgroundColor: Color.fromARGB(40, 255, 255, 255),
-                    fontSize: 10));
-          })
+          Text((((status.status[attr] ?? 10) - 10) ~/ 2).toString(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  backgroundColor: Color.fromARGB(40, 255, 255, 255),
+                  fontSize: 10))
         ],
       ),
     );
@@ -146,16 +105,18 @@ class _ProficiencieLineState extends State<ProficiencieLine> {
 class Proficiencies extends StatelessWidget {
   const Proficiencies({
     required this.proficiencies,
+    required this.attr,
     this.direction = Axis.vertical,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final List<String> proficiencies;
   final Axis direction;
+  final String attr;
 
   List<ProficiencieLine> makeLine() {
     List<ProficiencieLine> out = [];
     for (String proficiency in proficiencies) {
-      out.add(ProficiencieLine(proficiency: proficiency));
+      out.add(ProficiencieLine(proficiency: proficiency, attr: attr));
     }
     return out;
   }

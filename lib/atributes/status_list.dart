@@ -1,56 +1,37 @@
-import 'package:ficha/atributes/status_controller/status_controller.dart';
 import 'package:flutter/material.dart';
 import 'status_box.dart';
 
 class StatusList extends StatelessWidget {
-  final StatusController statusController;
-  const StatusList({super.key, required this.statusController});
+  const StatusList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      StatusBoxData(
-          attr: 'Strength',
-          controller: statusController,
-          child: const StatusBox(proficiencies: ['Atletics'])),
-      StatusBoxData(
+    return const Column(children: [
+      StatusBox(attr: 'Strength', proficiencies: ['Atletics']),
+      StatusBox(
           attr: 'Dexterity',
-          controller: statusController,
-          child: const StatusBox(
-              proficiencies: ['Acrobatics', 'Sneaky', 'Sleight of hands'])),
-      StatusBoxData(
-          controller: statusController,
-          attr: 'Constitution',
-          child: const StatusBox(proficiencies: [])),
-      StatusBoxData(
-          controller: statusController,
-          attr: 'Intelligence',
-          child: const StatusBox(proficiencies: [
-            'Arcana',
-            'History',
-            'Investigation',
-            'Nature',
-            'Religion'
-          ])),
-      StatusBoxData(
-          controller: statusController,
-          attr: 'Wisdom',
-          child: const StatusBox(proficiencies: [
-            'Intuition',
-            'Animal Handling',
-            'Medicine',
-            'Perception',
-            'Survival'
-          ])),
-      StatusBoxData(
-          controller: statusController,
-          attr: 'Charisma',
-          child: const StatusBox(proficiencies: [
-            'Performance',
-            'Deception',
-            'Intimidation',
-            'Persuasion'
-          ]))
+          proficiencies: ['Acrobatics', 'Sneaky', 'Sleight of hands']),
+      StatusBox(attr: 'Constitution', proficiencies: []),
+      StatusBox(attr: 'Intelligence', proficiencies: [
+        'Arcana',
+        'History',
+        'Investigation',
+        'Nature',
+        'Religion'
+      ]),
+      StatusBox(attr: 'Wisdom', proficiencies: [
+        'Intuition',
+        'Animal Handling',
+        'Medicine',
+        'Perception',
+        'Survival'
+      ]),
+      StatusBox(attr: 'Charisma', proficiencies: [
+        'Performance',
+        'Deception',
+        'Intimidation',
+        'Persuasion'
+      ])
     ]);
   }
 }

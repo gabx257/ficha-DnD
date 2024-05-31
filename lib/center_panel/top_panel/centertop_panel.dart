@@ -1,35 +1,28 @@
+import 'package:ficha/atributes/notifiers/status.dart';
 import 'package:ficha/center_panel/top_panel/top_panel_containers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-
-import '../../atributes/status_controller/status_controller.dart';
+import 'package:provider/provider.dart';
 import '../../core/shadowbox.dart';
-import '../controllers/health_controler/health_controler.dart';
-import '../controllers/hitdie_controler/hitdie_controler.dart';
-import 'ACHitDie.dart';
-import 'HealthContainer.dart';
+import 'armor_hitdie.dart';
+import 'health_container.dart';
 
 class HealthACContainer extends StatelessWidget {
   final double shapesSize;
   final double containersSize;
-  HealthACContainer({
+  const HealthACContainer({
     this.shapesSize = 120,
     this.containersSize = 80,
     super.key,
   });
-  final HealthControler controller = HealthControler();
-  final HitDieController dieController = HitDieController();
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        AllHealthContainers(shapesSize: shapesSize, controller: controller),
+        AllHealthContainers(shapesSize: shapesSize),
         ACAndHitDie(
-          dieController: HitDieController(),
           shapesSize: shapesSize,
-          controller: controller,
         ),
       ],
     );
@@ -37,16 +30,16 @@ class HealthACContainer extends StatelessWidget {
 }
 
 class CenterTopPanel extends StatelessWidget {
-  final StatusController controller;
-  const CenterTopPanel({super.key, required this.controller});
+  const CenterTopPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.read<StatusNotifier>();
     return ShadowBox(
         innerpadding: const [00.0, 20.0, 0.0, 0.0],
         height: 430,
         children: [
-          HealthACContainer(shapesSize: 150),
+          const HealthACContainer(shapesSize: 150),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             const CenterPanelBoxes(
                 text: 'Proficiencie',
@@ -54,14 +47,12 @@ class CenterTopPanel extends StatelessWidget {
                 fontsize: 13,
                 size: 100,
                 alignment: MainAxisAlignment.spaceBetween),
-            Observer(builder: (_) {
-              return CenterPanelBoxes(
-                text: 'Initiative',
-                alignment: MainAxisAlignment.spaceBetween,
-                shape: const SquareBox(),
-                value: (controller.status['Dexterity'] - 10) ~/ 2,
-              );
-            }),
+            CenterPanelBoxes(
+              text: 'Initiative',
+              alignment: MainAxisAlignment.spaceBetween,
+              shape: const SquareBox(),
+              value: (controller.status['Dexterity']! - 10) ~/ 2,
+            ),
             const CenterPanelBoxes(
               text: 'Moviment',
               shape: SquareBox(),

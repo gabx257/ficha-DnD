@@ -1,8 +1,9 @@
-import 'package:ficha/center_panel/controllers/health_controler/health_controler.dart';
+import 'package:ficha/center_panel/notifiers/health.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-class TextInputBox extends StatefulWidget {
+class TextInputBox extends StatelessWidget {
   final bool? filled;
   final int? maxchar;
   final String? display;
@@ -11,65 +12,44 @@ class TextInputBox extends StatefulWidget {
   final TextEditingController? controller;
   final List<TextInputFormatter>? filter;
 
-  const TextInputBox(
-      {Key? key,
+  TextInputBox(
+      {super.key,
       this.filled,
       this.maxchar,
       this.display,
       this.onChanged,
       this.onTapOutside,
       this.filter,
-      this.controller})
-      : super(key: key);
+      this.controller});
 
-  @override
-  _TextInputBoxState createState() => _TextInputBoxState();
-}
+  final TextEditingController _controller = TextEditingController();
 
-class _TextInputBoxState extends State<TextInputBox> {
-  late final TextEditingController _controller;
   final FocusNode _focusNode = FocusNode();
-  late String _display;
-  late String _oldDisplay;
-
-  @override
-  void initState() {
-    super.initState();
-    _display = '';
-    _oldDisplay = _display;
-    _controller = widget.controller ?? TextEditingController(text: _display);
-  }
 
   void _onChanged(String value) {
-    setState(() {
-      _display = value.isEmpty ? _oldDisplay : value;
-    });
-    widget.onChanged?.call(value);
+    _controller.text = value;
   }
 
-  void _onTapOutside(PointerDownEvent event) {
-    setState(() {
-      _display = _display.isEmpty ? _oldDisplay : _display;
-    });
-    widget.onTapOutside?.call(event, _display);
+  void _onTapOutside(PointerDownEvent event, HealthNotifier notifier) {
+    onTapOutside?.call(event, _controller.text);
     _focusNode.unfocus();
   }
 
   @override
   Widget build(BuildContext context) {
+    final health = context.watch<HealthNotifier>();
     return TextField(
       style: const TextStyle(fontSize: 30),
       focusNode: _focusNode,
       controller: _controller,
       onChanged: _onChanged,
-      onTapOutside: _onTapOutside,
-      inputFormatters:
-          widget.filter ?? [FilteringTextInputFormatter.digitsOnly],
+      onTapOutside: (e) => _onTapOutside(e, health),
+      inputFormatters: filter ?? [FilteringTextInputFormatter.digitsOnly],
       decoration: InputDecoration(
         contentPadding: EdgeInsets.zero,
         counter: const SizedBox(),
         fillColor: Colors.grey,
-        filled: widget.filled,
+        filled: filled,
         border: const OutlineInputBorder(borderSide: BorderSide.none),
         focusedBorder: const OutlineInputBorder(
           borderSide:
@@ -79,51 +59,24 @@ class _TextInputBoxState extends State<TextInputBox> {
       textAlign: TextAlign.center,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
-      maxLength: widget.maxchar,
+      maxLength: maxchar,
     );
   }
 }
 
 class HealthPointsInputBox extends TextInputBox {
-  final HealthControler hpcontroller;
-
-  const HealthPointsInputBox({
-    Key? key,
-    bool? filled,
-    int? maxchar,
-    String? display,
-    void Function(String)? onChanged,
-    void Function(PointerDownEvent, String)? onTapOutside,
-    required this.hpcontroller,
-  }) : super(
-          key: key,
-          filled: filled,
-          maxchar: maxchar,
-          display: display,
-          onChanged: onChanged,
-          onTapOutside: onTapOutside,
-        );
+  HealthPointsInputBox({
+    super.key,
+    super.filled,
+    super.maxchar,
+    super.display,
+    super.onChanged,
+    super.onTapOutside,
+  });
 
   @override
-  _HealthPointsInputBoxState createState() => _HealthPointsInputBoxState();
-}
-
-class _HealthPointsInputBoxState extends _TextInputBoxState {
-  late final HealthControler _hpcontroller;
-  @override
-  HealthPointsInputBox get widget => super.widget as HealthPointsInputBox;
-  @override
-  void initState() {
-    super.initState();
-    _hpcontroller = widget.hpcontroller;
-    if (widget.display != null) {
-      _controller.text = widget.display!;
-    }
-  }
-
-  @override
-  void _onTapOutside(PointerDownEvent event) {
-    _hpcontroller.updateTempHealth(_display);
-    super._onTapOutside(event);
+  void _onTapOutside(PointerDownEvent event, HealthNotifier notifier) {
+    notifier.health = int.parse(_controller.text);
+    super._onTapOutside(event, notifier);
   }
 }

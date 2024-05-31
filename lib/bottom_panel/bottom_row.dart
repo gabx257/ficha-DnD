@@ -10,8 +10,8 @@ class BottomRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: const [
+    return const Row(
+      children: [
         Abilities(title: "Abilities"),
         ToolsEProficiencies(
           title: "Tools & Proficiencies",
@@ -23,18 +23,10 @@ class BottomRow extends StatelessWidget {
 
 class Abilities extends ListingBox<SpellList> {
   const Abilities(
-      {super.key,
-      super.title,
-      super.controller,
-      super.height = 300,
-      super.width = 725});
+      {super.key, super.title, super.height = 300, super.width = 725});
 }
 
 class ToolsEProficiencies extends ListingBox<SpellList> {
   const ToolsEProficiencies(
-      {super.key,
-      super.title,
-      super.controller,
-      super.height = 300,
-      super.width = 725});
+      {super.key, super.title, super.height = 300, super.width = 725});
 }

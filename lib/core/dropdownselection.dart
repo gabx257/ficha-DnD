@@ -66,7 +66,8 @@ class DropDownSelection extends StatelessWidget {
 }
 
 class ListingBox<T extends BaseModelsList> extends StatelessWidget {
-  ListingBox({super.key, this.title = "", this.height = 580, this.width = 600});
+  const ListingBox(
+      {super.key, this.title = "", this.height = 580, this.width = 600});
 
   final String title;
   final double height;

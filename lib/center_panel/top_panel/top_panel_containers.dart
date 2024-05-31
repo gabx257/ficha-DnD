@@ -48,7 +48,7 @@ class CenterPanelBoxes extends StatelessWidget {
                       value.toString(),
                       style: const TextStyle(fontSize: 30),
                     )
-                  : const SizedBox(
+                  : SizedBox(
                       width: 75,
                       child: TextInputBox(
                         maxchar: 4,

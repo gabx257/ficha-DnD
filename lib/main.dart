@@ -8,14 +8,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'atributes/status_list.dart';
-import 'atributes/status_controller/status_controller.dart';
 import 'bottom_panel/bottom_row.dart';
 import 'center_panel/center_panel.dart';
 import 'core/list_selector.dart';
 import 'models/Character.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => DropDownSelectionNotifier()),
@@ -45,8 +43,6 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusController = StatusController();
-
     final scrollController = ScrollController();
 
     return Scaffold(
@@ -78,16 +74,12 @@ class MainPage extends StatelessWidget {
             child: SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1500),
-                child: Column(
+                child: const Column(
                   children: [
                     Row(
-                      children: [
-                        StatusList(statusController: statusController),
-                        CenterColumn(controller: statusController),
-                        RightPanel(statusController: statusController)
-                      ],
+                      children: [StatusList(), CenterColumn(), RightPanel()],
                     ),
-                    const BottomRow()
+                    BottomRow()
                   ],
                 ),
               ),
@@ -161,8 +153,8 @@ class CharacterInfoBox extends StatelessWidget {
             border: Border.all(color: Colors.white),
             borderRadius: BorderRadius.circular(10)),
         constraints: BoxConstraints.loose(Size.fromWidth(fieldSize)),
-        child: const TextInputBox(
-          filter: [],
+        child: TextInputBox(
+          filter: const [],
         ));
   }
 }

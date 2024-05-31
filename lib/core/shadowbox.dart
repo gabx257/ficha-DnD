@@ -5,7 +5,7 @@ class ShadowBox extends StatelessWidget {
   ///
   ///the default padding is 10
   const ShadowBox(
-      {Key? key,
+      {super.key,
       this.shadow,
       this.children,
       this.width,
@@ -15,8 +15,7 @@ class ShadowBox extends StatelessWidget {
       this.color,
       this.mainAxis,
       this.crossAxis,
-      this.direction})
-      : super(key: key);
+      this.direction});
   final Color? color;
   final BoxShadow? shadow;
   final List<Widget>? children;
