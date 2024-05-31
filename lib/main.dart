@@ -1,3 +1,6 @@
+import 'package:ficha/atributes/notifiers/status.dart';
+import 'package:ficha/center_panel/notifiers/health.dart';
+import 'package:ficha/center_panel/notifiers/hitdie.dart';
 import 'package:ficha/core/notifiers/current_loaded_data.dart';
 import 'package:ficha/core/notifiers/description_drawer.dart';
 import 'package:ficha/core/notifiers/dropdown_selection.dart';
@@ -19,6 +22,9 @@ void main() async {
       ChangeNotifierProvider(create: (context) => DropDownSelectionNotifier()),
       ChangeNotifierProvider(create: (context) => DescriptionDrawerNotifier()),
       ChangeNotifierProvider(create: (context) => CurrentLoadedData()),
+      ChangeNotifierProvider(create: (context) => StatusNotifier()),
+      ChangeNotifierProvider(create: (context) => HealthNotifier()),
+      ChangeNotifierProvider(create: (context) => HitDieNotifier()),
       Provider(create: (context) => Singletons()),
     ],
     child: MaterialApp(

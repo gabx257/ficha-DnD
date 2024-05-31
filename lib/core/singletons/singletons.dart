@@ -5,8 +5,8 @@ import 'package:ficha/models/spells.dart';
 
 class Singletons {
   SpellList spells = SpellList();
-  CharacterList characters = CharacterList();
   EquipmentList equipment = EquipmentList();
+  CharacterList characters = CharacterList();
 
   T returnRelevantModel<T extends BaseModelsList>() {
     if (T == SpellList) {

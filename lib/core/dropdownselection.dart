@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:ficha/core/list_selector.dart';
+import 'package:ficha/core/notifiers/current_loaded_data.dart';
 import 'package:ficha/core/shadowbox.dart';
 import 'package:ficha/core/singletons/singletons.dart';
 import 'package:ficha/core/textinput.dart';
@@ -73,7 +74,10 @@ class ListingBox<T extends BaseModelsList> extends StatelessWidget {
   final double height;
   final double width;
 
-  List<Widget> createList(T l) {
+  List<Widget> createList(T? l) {
+    if (l == null) {
+      return [];
+    }
     List<Widget> list = [];
     for (var item in l) {
       list.add(Item(
@@ -87,7 +91,9 @@ class ListingBox<T extends BaseModelsList> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final T list = context.watch<Singletons>().returnRelevantModel<T>();
+    final T? list = context.read<CurrentLoadedData>().get<T>();
+    final T fullList = context.read<Singletons>().returnRelevantModel<T>();
+
     return ShadowBox(
       innerpadding: 0,
       height: height,
@@ -101,7 +107,7 @@ class ListingBox<T extends BaseModelsList> extends StatelessWidget {
             child: Text(title, style: const TextStyle(fontSize: 20))),
         ListSelector(
           itens: createList(list),
-          list: list,
+          list: fullList,
         )
       ],
     );

@@ -24,13 +24,14 @@
         "Investigation",
         "Medicine"
     ],
-    "equipment": [
-        "Staff of Power",
-        "Ring of Spell Turning",
-        "Spellbook",
-        "Robes of the Archmagi"
+    "equipment": [],
+    "spells": [
+        "Fireball",
+        "Lightning Bolt",
+        "Magic Missile",
+        "Counterspell",
+        "Wall of Force"
     ],
-    "spells": "[Fireball, Lightning Bolt, Magic Missile, Counterspell, Wall of Force]",
     "spellSlots": {
         "1stLevel": 4,
         "2ndLevel": 3,

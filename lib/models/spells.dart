@@ -79,7 +79,7 @@ class Spell extends BaseModel {
 }
 
 class SpellList extends BaseModelsList<Spell> {
-  static late final SpellList? _instance;
+  static SpellList? _instance;
 
   SpellList() {
     if (_instance != null) return;

@@ -113,10 +113,9 @@ class Character extends BaseModel {
 
 class CharacterList extends BaseModelsList<Character> {
   CharacterList() {
-    late Map<String, dynamic> characterJson;
     for (var characterFile in Directory("assets/saved/").listSync()) {
-      characterJson = jsonDecode(File(characterFile.path).readAsStringSync());
-      add(Character.fromJson(characterJson));
+      add(Character.fromJson(
+          jsonDecode(File(characterFile.path).readAsStringSync())));
     }
   }
 

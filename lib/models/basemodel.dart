@@ -44,30 +44,38 @@ abstract class BaseModel implements JsonConvertableModel {
   Iterable<MapEntry<String, dynamic>> get iterator => toMap.entries;
 }
 
-abstract class BaseModelsList<T extends BaseModel> with ListMixin<T> {
+class BaseModelsList<T extends BaseModel> with ListMixin<T> {
+  final List<T> _list = [];
   Iterable<String> get names => map((e) => e.name);
 
   @override
-  int length;
+  int get length => _list.length;
 
-  BaseModelsList.empty() : length = 0;
+  @override
+  set length(int newLength) => _list.length = newLength;
 
-  BaseModelsList() : length = 0;
+  @override
+  void add(T element) => _list.add(element);
+
+  BaseModelsList.empty();
+
+  BaseModelsList();
 
   @override
   T operator [](dynamic name) {
     if (name is int) {
-      return this[name];
+      return _list[name];
     }
+    print(name);
     return firstWhere((element) => element.name == name);
   }
 
   @override
   void operator []=(dynamic index, T value) {
     if (index is int) {
-      this[index] = value;
+      _list[index] = value;
     }
-    for (var element in this) {
+    for (var element in _list) {
       if (element.name == index) {
         element = value;
         break;

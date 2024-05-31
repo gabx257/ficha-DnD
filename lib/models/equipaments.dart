@@ -9,7 +9,7 @@ import 'package:ficha/models/basemodel.dart';
 // it is used to populate the dropdowns in the EquipmentList
 // and to get the equipment description to be displayed in the DescriptionDrawer
 class EquipmentList extends BaseModelsList<Equipment> {
-  static late final EquipmentList? _instance;
+  static EquipmentList? _instance;
   EquipmentList() {
     if (_instance != null) return;
     final List equipamentJson =
