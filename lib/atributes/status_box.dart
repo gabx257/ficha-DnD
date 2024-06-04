@@ -1,5 +1,7 @@
-import 'package:ficha/atributes/notifiers/status.dart';
+import 'package:ficha/atributes/notifiers/atribute.dart';
+import 'package:ficha/atributes/notifiers/proficiencies.dart';
 import 'package:ficha/core/checkbox.dart';
+import 'package:ficha/core/notifiers/current_loaded_data.dart';
 import 'package:ficha/core/shadowbox.dart';
 import 'package:ficha/core/textinput.dart';
 import 'package:flutter/material.dart';
@@ -19,91 +21,104 @@ class StatusBox extends StatelessWidget {
       mainAxis: MainAxisAlignment.start,
       direction: Axis.horizontal,
       children: [
-        Atributes(
+        AtributeModifier(
           attr: attr,
         ),
-        Proficiencies(proficiencies: proficiencies, attr: attr),
+        ChangeNotifierProvider(
+            create: (context) =>
+                ProficienciesNotifier(attr: attr, proficiencies: proficiencies),
+            child: ProficiencyList(proficiencies: proficiencies, attr: attr)),
       ],
     );
   }
 }
 
-class Atributes extends StatelessWidget {
+class AtributeModifier extends StatelessWidget {
   final String attr;
-  const Atributes({super.key, required this.attr});
+  const AtributeModifier({super.key, required this.attr});
 
   @override
   Widget build(BuildContext context) {
-    final StatusNotifier status = context.watch<StatusNotifier>();
+    final AttributesNotifier status = context.read<AttributesNotifier>();
     return ShadowBox(
       padding: 5,
+      innerpadding: 0,
       mainAxis: MainAxisAlignment.spaceAround,
       width: 100,
       children: [
-        Text(attr),
-        Flexible(
-          flex: 70,
-          child: TextInputBox(
-            onChanged: (event) => status.status[attr] = int.tryParse(event)!,
-            filled: true,
-          ),
+        Text(
+          attr,
+          style: Theme.of(context).textTheme.titleSmall,
         ),
-        const Spacer(),
-        Flexible(
-          flex: 50,
-          child: Container(
-            width: 60,
-            height: 35,
-            decoration: BoxDecoration(
-                border: Border.all(
-                    color: const Color.fromARGB(255, 10, 15, 70), width: 1),
-                borderRadius: const BorderRadius.all(Radius.elliptical(60, 35)),
-                color: Colors.white),
-            child: Center(
-              child: Text(
-                ((status.status[attr]! - 10) ~/ 2).toString(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.black),
-              ),
-            ),
-          ),
-        )
+        Atribute(status: status, attr: attr),
+        Modifier(attr: attr)
       ],
     );
   }
 }
 
-class ProficiencieLine extends StatelessWidget {
-  const ProficiencieLine(
-      {super.key, required this.proficiency, required this.attr});
-  final String proficiency;
+class Atribute extends StatelessWidget {
+  const Atribute({
+    super.key,
+    required this.status,
+    required this.attr,
+  });
+
+  final AttributesNotifier status;
   final String attr;
 
   @override
   Widget build(BuildContext context) {
-    final StatusNotifier status = context.watch<StatusNotifier>();
     return SizedBox(
-      height: 25,
-      child: Row(
-        children: [
-          const CustomCheckBox(value: false),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 3, right: 2),
-            child: Text(proficiency),
-          ),
-          Text((((status.status[attr] ?? 10) - 10) ~/ 2).toString(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  backgroundColor: Color.fromARGB(40, 255, 255, 255),
-                  fontSize: 10))
-        ],
+      width: 70,
+      height: 40,
+      child: TextInputBox(
+        onChanged: (event) {
+          status[attr] = int.tryParse(event) ?? 10;
+        },
+        filled: true,
       ),
     );
   }
 }
 
-class Proficiencies extends StatelessWidget {
-  const Proficiencies({
+class Modifier extends StatelessWidget {
+  const Modifier({
+    super.key,
+    required this.attr,
+  });
+
+  final String attr;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 60,
+      height: 35,
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.elliptical(60, 35)),
+          color: Colors.white),
+      child: Center(
+        child: Selector<AttributesNotifier, int>(
+          selector: (_, n) => n[attr]!,
+          builder: (c, atr, w) {
+            return Text(
+              atr.modifier.toString(),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Colors.black),
+              textAlign: TextAlign.center,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class ProficiencyList extends StatelessWidget {
+  const ProficiencyList({
     required this.proficiencies,
     required this.attr,
     this.direction = Axis.vertical,
@@ -113,10 +128,10 @@ class Proficiencies extends StatelessWidget {
   final Axis direction;
   final String attr;
 
-  List<ProficiencieLine> makeLine() {
-    List<ProficiencieLine> out = [];
+  List<Proficiency> makeLine(BuildContext context) {
+    List<Proficiency> out = [];
     for (String proficiency in proficiencies) {
-      out.add(ProficiencieLine(proficiency: proficiency, attr: attr));
+      out.add(Proficiency(proficiency: proficiency, attr: attr));
     }
     return out;
   }
@@ -125,13 +140,61 @@ class Proficiencies extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flexible(
       flex: 2,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 15.0),
-        child: Flex(
-            direction: direction,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: makeLine()),
+      child: Flex(
+          direction: direction,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: makeLine(context)),
+    );
+  }
+}
+
+class Proficiency extends StatelessWidget {
+  const Proficiency({super.key, required this.proficiency, required this.attr});
+  final String proficiency;
+  final String attr;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 25,
+      child: Row(
+        children: [
+          CustomCheckBox(
+            value: false,
+            onChanged: (value) => context
+                .read<ProficienciesNotifier>()[proficiency] = value ?? false,
+          ),
+          Text(proficiency, style: Theme.of(context).textTheme.labelSmall),
+          BonusModifierTotal(attr: attr, proficiency: proficiency)
+        ],
+      ),
+    );
+  }
+}
+
+class BonusModifierTotal extends StatelessWidget {
+  const BonusModifierTotal({
+    super.key,
+    required this.attr,
+    required this.proficiency,
+  });
+
+  final String attr;
+  final String proficiency;
+
+  @override
+  Widget build(BuildContext context) {
+    var mod =
+        context.watch<CurrentLoadedData>().character.level?.proficiencyModifier;
+    return Padding(
+      padding: const EdgeInsets.only(left: 3.0),
+      child: Selector2<AttributesNotifier, ProficienciesNotifier, (int, bool)>(
+        selector: (_, a, p) => (a[attr]!, p[proficiency]!),
+        builder: (a, values, c) => Text(
+          (values.$1.modifier + (values.$2 ? (mod ?? 2) : 0)).toString(),
+          style: Theme.of(context).textTheme.labelMedium!,
+        ),
       ),
     );
   }

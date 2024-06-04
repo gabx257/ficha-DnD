@@ -1,6 +1,8 @@
-import 'package:ficha/atributes/notifiers/status.dart';
+import 'package:ficha/atributes/notifiers/atribute.dart';
+import 'package:ficha/atributes/notifiers/proficiencies.dart';
 import 'package:ficha/core/checkbox.dart';
-import 'package:ficha/core/dropdownselection.dart';
+import 'package:ficha/core/dropdown_selection.dart';
+import 'package:ficha/core/notifiers/current_loaded_data.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -45,14 +47,7 @@ class TopRightPanel extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 8.0),
               child: Text("Saving Throws"),
             ),
-            SavingThrows(proficiencies: [
-              "Strength",
-              "Dexterity",
-              "Constitution",
-              "Intelligence",
-              "Wisdom",
-              "Charisma"
-            ])
+            SavingThrows()
           ],
         ),
         SizedBox(width: 400, child: SpecialResources())
@@ -77,59 +72,67 @@ class SpecialResources extends StatelessWidget {
 
 class SavingThrows extends StatelessWidget {
   const SavingThrows({
-    required this.proficiencies,
-    this.direction = Axis.vertical,
     super.key,
   });
-  final List<String> proficiencies;
-  final Axis direction;
-
-  List<SavingThrowsLine> makeLine() {
-    List<SavingThrowsLine> out = [];
-    for (String proficiency in proficiencies) {
-      out.add(SavingThrowsLine(proficiency: proficiency));
-    }
-    return out;
-  }
+  final List<String> proficiencies = const [
+    "Strength",
+    "Dexterity",
+    "Constitution",
+    "Intelligence",
+    "Wisdom",
+    "Charisma"
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Flexible(
-      flex: 2,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 15.0),
-        child: Flex(
-            direction: direction,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: makeLine()),
+    return ChangeNotifierProvider<ProficienciesNotifier>(
+        create: (_) => ProficienciesNotifier(
+            attr: 'savingThrows', proficiencies: proficiencies),
+        builder: (_, w) => Column(
+            children:
+                proficiencies.map((e) => SavingThrowsLine(attr: e)).toList()));
+  }
+}
+
+class SavingThrowsLine extends StatelessWidget {
+  const SavingThrowsLine({super.key, required this.attr});
+  final String attr;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 25,
+      child: Row(
+        children: [
+          CustomCheckBox(
+              value: false,
+              onChanged: (v) =>
+                  context.read<ProficienciesNotifier>()[attr] = v ?? false),
+          Text(attr, style: Theme.of(context).textTheme.labelSmall),
+          BonusModifierTotal(attr: attr)
+        ],
       ),
     );
   }
 }
 
-class SavingThrowsLine extends StatelessWidget {
-  const SavingThrowsLine({super.key, required this.proficiency});
-  final String proficiency;
+class BonusModifierTotal extends StatelessWidget {
+  const BonusModifierTotal({super.key, required this.attr});
+
+  final String attr;
 
   @override
   Widget build(BuildContext context) {
-    final StatusNotifier controller = context.read<StatusNotifier>();
-    return SizedBox(
-      height: 25,
-      child: Row(
-        children: [
-          const CustomCheckBox(value: false),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 3, right: 2),
-            child: Text(proficiency),
-          ),
-          Text((((controller.status[proficiency] ?? 0) - 10) ~/ 2).toString(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  backgroundColor: Color.fromARGB(40, 255, 255, 255),
-                  fontSize: 10))
-        ],
+    var mod =
+        context.watch<CurrentLoadedData>().character.level?.proficiencyModifier;
+    return Padding(
+      padding: const EdgeInsets.only(left: 3.0),
+      child: Selector2<AttributesNotifier, ProficienciesNotifier, (int, bool)>(
+        selector: (_, a, p) => (a[attr]!, p[attr]!),
+        builder: (a, values, c) => Text(
+          (values.$1.modifier + (values.$2 ? (mod ?? 2) : 0)).toString(),
+          style: Theme.of(context).textTheme.labelMedium!,
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
-import 'package:ficha/atributes/notifiers/status.dart';
+import 'package:ficha/atributes/notifiers/atribute.dart';
 import 'package:ficha/center_panel/top_panel/top_panel_containers.dart';
+import 'package:ficha/core/notifiers/current_loaded_data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/shadowbox.dart';
@@ -34,35 +35,39 @@ class CenterTopPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<StatusNotifier>();
+    final attr = context.read<AttributesNotifier>();
     return ShadowBox(
-        innerpadding: const [00.0, 20.0, 0.0, 0.0],
-        height: 430,
+        innerpadding: const [00.0, 10.0, 0.0, 0.0],
+        height: 440,
         children: [
           const HealthACContainer(shapesSize: 150),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            const CenterPanelBoxes(
-                text: 'Proficiencie',
-                shape: SquareBox(),
+            Selector<CurrentLoadedData, int?>(
+              selector: (context, data) =>
+                  data.character.level?.proficiencyModifier,
+              builder: (c, d, w) => CenterPanelBoxes(
+                text: 'Proficiency',
+                shape: const ShadowBox(width: 150),
+                value: d ?? 2,
                 fontsize: 13,
-                size: 100,
-                alignment: MainAxisAlignment.spaceBetween),
+                size: 150,
+              ),
+            ),
             CenterPanelBoxes(
               text: 'Initiative',
-              alignment: MainAxisAlignment.spaceBetween,
-              shape: const SquareBox(),
-              value: (controller.status['Dexterity']! - 10) ~/ 2,
+              shape: const ShadowBox(
+                width: 150,
+              ),
+              size: 150,
+              value: (attr.dexterity.modifier),
             ),
             const CenterPanelBoxes(
               text: 'Moviment',
-              shape: SquareBox(),
-              alignment: MainAxisAlignment.spaceBetween,
+              shape: ShadowBox(
+                width: 150,
+              ),
+              size: 150,
             ),
-            const CenterPanelBoxes(
-              text: 'NAO SEI',
-              shape: SquareBox(),
-              alignment: MainAxisAlignment.spaceBetween,
-            )
           ])
         ]);
   }

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:ficha/atributes/notifiers/atribute.dart';
 import 'package:ficha/center_panel/notifiers/health.dart';
 import 'package:ficha/center_panel/notifiers/hitdie.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:provider/provider.dart';
 
 import '../../core/shadowbox.dart';
 import 'top_panel_containers.dart';
+
+enum DieType { d4, d6, d8, d10, d12, d20 }
 
 class ACAndHitDie extends StatelessWidget {
   const ACAndHitDie({
@@ -23,15 +26,7 @@ class ACAndHitDie extends StatelessWidget {
     return Column(children: [
       Padding(
         padding: const EdgeInsets.only(top: 5.0),
-        child: CenterPanelBoxes(
-          size: shapesSize,
-          text: "AC",
-          shape: SvgPicture.asset(
-            'assets/Shield.svg',
-            // ignore: deprecated_member_use
-            color: const Color.fromARGB(255, 129, 137, 179),
-          ),
-        ),
+        child: AC(shapesSize: shapesSize),
       ),
       const SizedBox(
         height: 20,
@@ -41,21 +36,106 @@ class ACAndHitDie extends StatelessWidget {
   }
 }
 
+class HitDieBox extends StatelessWidget {
+  const HitDieBox({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const ShadowBox(
+        innerpadding: 10,
+        direction: Axis.horizontal,
+        height: 85,
+        width: 200,
+        children: [
+          HitdieDisplay(),
+          Column(children: [
+            HitDieControlpart(size: 30, add: true),
+            SizedBox(height: 5),
+            HitDieControlpart(size: 30, add: false),
+          ]),
+        ]);
+  }
+}
+
+class HitdieDisplay extends StatelessWidget {
+  const HitdieDisplay({
+    super.key,
+  });
+
+  List<DieBox> generateDieBoxes(int dieCount) {
+    List<DieBox> list = [];
+    for (int i = 0; i < dieCount; i++) {
+      list.add(const DieBox(
+        dieType: DieType.d6,
+        size: 35,
+      ));
+    }
+    return list;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final die = context.watch<HitDieNotifier>();
+    List<DieBox> list = generateDieBoxes(die.hitDie);
+    return Flexible(
+        child: list.length < 8
+            ? Wrap(spacing: 0, runSpacing: 0, children: list)
+            : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('${list.length} x '),
+                list[0],
+              ]));
+  }
+}
+
 class DieBox extends StatelessWidget {
   const DieBox({
     super.key,
     required this.size,
-    this.text = 'd6',
-    this.color = const Color.fromARGB(255, 255, 217, 0),
+    required this.dieType,
   });
 
   final double size;
-  final String text;
-  final Color color;
+  final DieType dieType;
 
-  void _onPressed(HealthNotifier health, HitDieNotifier die) {
-    health.health += _rollDie(int.parse(text.substring(1)));
-    die.hitDie -= 1;
+  IconData get _getIcon {
+    switch (dieType) {
+      case DieType.d4:
+        return Icons.looks_4;
+      case DieType.d6:
+        return Icons.looks_6;
+      case DieType.d8:
+        return Icons.looks_6;
+      case DieType.d10:
+        return Icons.looks_6;
+      case DieType.d12:
+        return Icons.looks_6;
+      case DieType.d20:
+        return Icons.looks_6;
+    }
+  }
+
+  int get _rollMax {
+    switch (dieType) {
+      case DieType.d4:
+        return 4;
+      case DieType.d6:
+        return 6;
+      case DieType.d8:
+        return 8;
+      case DieType.d10:
+        return 10;
+      case DieType.d12:
+        return 12;
+      case DieType.d20:
+        return 20;
+    }
+  }
+
+  void _onPressed(HealthNotifier health, HitDieNotifier die, int con) {
+    health.health += _rollDie(_rollMax) + con.modifier;
+    die.decrease();
   }
 
   int _rollDie(int sides) {
@@ -65,34 +145,20 @@ class DieBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final health = context.watch<HealthNotifier>();
-    final die = context.watch<HitDieNotifier>();
-    return LimitedBox(
-      maxWidth: size,
-      maxHeight: size,
-      child: Container(
-        decoration: BoxDecoration(
-          color: color,
-          border: Border.all(
-            color: Colors.black,
-            width: 1,
+    final health = context.read<HealthNotifier>();
+    final die = context.read<HitDieNotifier>();
+    final con = context.read<AttributesNotifier>().constitution;
+    return IconButton(
+        padding: EdgeInsets.zero,
+        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+        iconSize: size,
+        onPressed: () => _onPressed(health, die, con),
+        icon: FittedBox(
+          fit: BoxFit.fill,
+          child: Icon(
+            _getIcon,
           ),
-        ),
-        child: TextButton(
-          //remove the button text decoration
-          style: ButtonStyle(
-            padding: WidgetStateProperty.all(EdgeInsets.zero),
-          ),
-          onPressed: () => _onPressed(health, die),
-          child: Text(
-            text,
-            style: const TextStyle(
-                decoration: TextDecoration.none, color: Colors.black),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
+        ));
   }
 }
 
@@ -101,82 +167,40 @@ class HitDieControlpart extends StatelessWidget {
     super.key,
     required this.size,
     required this.add,
-    required this.color,
   });
 
   final double size;
 
   final bool add;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    final dieNotifier = context.watch<HitDieNotifier>();
-    return LimitedBox(
-      maxWidth: size,
-      maxHeight: size,
-      child: Container(
-        decoration: BoxDecoration(
-          color: color,
-          border: Border.all(
-            color: Colors.black,
-            width: 1,
-          ),
-        ),
-        child: TextButton(
-          onPressed: () =>
-              add ? dieNotifier.increase() : dieNotifier.decrease(),
-          child: Text(
-            add ? '+' : '-',
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
+    final dieNotifier = context.read<HitDieNotifier>();
+    return IconButton(
+        padding: EdgeInsets.zero,
+        iconSize: size,
+        visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+        icon: Icon(add ? Icons.add : Icons.remove),
+        onPressed: () => add ? dieNotifier.increase() : dieNotifier.decrease());
   }
 }
 
-class HitDieBox extends StatelessWidget {
-  const HitDieBox({
+class AC extends StatelessWidget {
+  const AC({
     super.key,
+    required this.shapesSize,
   });
 
-  List<DieBox> generateDieBoxes(HitDieNotifier die) {
-    List<DieBox> list = [];
-    for (int i = 0; i < die.hitDie; i++) {
-      list.add(const DieBox(
-        size: 30,
-        color: Color.fromARGB(255, 255, 17, 0),
-      ));
-    }
-    return list;
-  }
+  final double shapesSize;
 
   @override
   Widget build(BuildContext context) {
-    final die = context.read<HitDieNotifier>();
-    List<DieBox> list = generateDieBoxes(die);
-    return LimitedBox(
-      maxWidth: 250,
-      child: ShadowBox(direction: Axis.horizontal, height: 85, children: [
-        Flexible(
-            child: Column(
-          children: [
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              ...list.take(6),
-              const HitDieControlpart(
-                size: 30,
-                add: true,
-                color: Colors.green,
-              )
-            ]),
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              ...list.skip(6),
-              const HitDieControlpart(size: 30, add: false, color: Colors.red)
-            ])
-          ],
-        ))
-      ]),
+    return CenterPanelBoxes(
+      size: shapesSize,
+      text: "AC",
+      shape: SvgPicture.asset(
+        'assets/Shield.svg',
+      ),
     );
   }
 }

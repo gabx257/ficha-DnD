@@ -20,4 +20,15 @@ class CurrentLoadedData with ChangeNotifier {
         return null;
     }
   }
+
+  void loadCharacter(Character character) {
+    this.character = character;
+    notifyListeners();
+  }
+}
+
+extension ProficiencyModifier on int {
+  int get proficiencyModifier {
+    return 1 + (this / 4).ceil();
+  }
 }

@@ -20,45 +20,46 @@ class CenterPanelBoxes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LimitedBox(
-      maxWidth: size,
-      maxHeight: size,
+    return SizedBox(
+      width: size,
+      height: size,
       child: Stack(alignment: AlignmentDirectional.topCenter, children: [
         shape,
         Column(
           mainAxisAlignment: alignment ?? MainAxisAlignment.center,
           children: [
-            const Spacer(flex: 1),
-            Flexible(
-              flex: 5,
-              child: Text(
-                text,
-                textAlign: TextAlign.center,
-                softWrap: true,
-                style: TextStyle(
-                    fontSize: fontsize,
-                    color: const Color.fromARGB(255, 255, 255, 255),
-                    backgroundColor: const Color.fromARGB(0, 5, 24, 129)),
-              ),
-            ),
-            Flexible(
-              flex: 5,
-              child: value != null
-                  ? Text(
-                      value.toString(),
-                      style: const TextStyle(fontSize: 30),
-                    )
-                  : SizedBox(
-                      width: 75,
-                      child: TextInputBox(
-                        maxchar: 4,
-                      )),
-            ),
-            const Spacer()
+            Text(text, style: Theme.of(context).textTheme.titleLarge),
+            ConditionallyEditableBox(value: value),
           ],
         )
       ]),
     );
+  }
+}
+
+/// value is null, then it is editable
+class ConditionallyEditableBox extends StatelessWidget {
+  const ConditionallyEditableBox({
+    super.key,
+    required this.value,
+  });
+
+  final dynamic value;
+
+  @override
+  Widget build(BuildContext context) {
+    return value != null
+        ? SizedBox(
+            width: 50,
+            height: 50,
+            child: Center(
+              child: Text(
+                value.toString(),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+          )
+        : SizedBox(width: 50, child: TextInputBox());
   }
 }
 
@@ -126,13 +127,40 @@ class SquareBox extends StatelessWidget {
   }
 }
 
-class HeartShape extends CustomPainter {
+class HeartShape extends StatelessWidget {
   final Color bodyColor;
   final Color borderColor;
   final double borderWidth;
   final double fillPercentage;
 
-  HeartShape(
+  const HeartShape(
+      {super.key,
+      this.bodyColor = const Color.fromARGB(255, 255, 17, 0),
+      this.borderColor = Colors.white,
+      this.borderWidth = 2,
+      this.fillPercentage = 1});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size.infinite,
+      painter: _HeartShape(
+        bodyColor: bodyColor,
+        borderColor: borderColor,
+        borderWidth: borderWidth,
+        fillPercentage: fillPercentage,
+      ),
+    );
+  }
+}
+
+class _HeartShape extends CustomPainter {
+  final Color bodyColor;
+  final Color borderColor;
+  final double borderWidth;
+  final double fillPercentage;
+
+  _HeartShape(
       {this.bodyColor = const Color.fromARGB(255, 255, 17, 0),
       this.borderColor = const Color.fromARGB(255, 255, 255, 255),
       this.borderWidth = 2,

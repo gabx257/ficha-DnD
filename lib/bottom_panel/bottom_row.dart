@@ -1,4 +1,4 @@
-import 'package:ficha/core/dropdownselection.dart';
+import 'package:ficha/core/dropdown_selection.dart';
 import 'package:flutter/material.dart';
 
 import '../models/spells.dart';

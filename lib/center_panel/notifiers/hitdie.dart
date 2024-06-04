@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 
 class HitDieNotifier with ChangeNotifier {
-  int hitDie = 0;
+  int _hitDie = 0;
 
-  void increase() => hitDie < 12 ? hitDie++ : hitDie = 12;
+  int get hitDie => _hitDie;
 
-  void decrease() => hitDie > 0 ? hitDie-- : hitDie = 0;
+  void increase() {
+    hitDie < 20 ? _hitDie++ : null;
+    notifyListeners();
+  }
+
+  void decrease() {
+    hitDie > 0 ? _hitDie-- : null;
+    notifyListeners();
+  }
 }

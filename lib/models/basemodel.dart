@@ -66,7 +66,6 @@ class BaseModelsList<T extends BaseModel> with ListMixin<T> {
     if (name is int) {
       return _list[name];
     }
-    print(name);
     return firstWhere((element) => element.name == name);
   }
 

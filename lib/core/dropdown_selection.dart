@@ -9,13 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DropDownSelection extends StatelessWidget {
-  final String value;
+  final String? value;
   final List<String> items;
   final void Function(String?)? onChanged;
   final TextEditingController searchController = TextEditingController();
 
   DropDownSelection(
-      {super.key, required this.value, required this.items, this.onChanged});
+      {super.key, this.value, required this.items, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,6 @@ class DropDownSelection extends StatelessWidget {
       dropdownSearchData: DropdownSearchData(
         searchController: searchController,
         searchInnerWidget: TextInputBox(
-          controller: searchController,
           filter: const [],
         ),
         searchInnerWidgetHeight: 50,
@@ -42,7 +41,6 @@ class DropDownSelection extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      hint: Text(value),
       iconStyleData: const IconStyleData(
         icon: Padding(
           padding: EdgeInsets.only(right: 20.0),
@@ -50,7 +48,6 @@ class DropDownSelection extends StatelessWidget {
         ),
         iconSize: 24,
       ),
-      style: const TextStyle(color: Color.fromARGB(255, 230, 230, 230)),
       underline: Container(),
       onChanged: onChanged,
       items: items.map<DropdownMenuItem<String>>((String value) {
@@ -74,24 +71,8 @@ class ListingBox<T extends BaseModelsList> extends StatelessWidget {
   final double height;
   final double width;
 
-  List<Widget> createList(T? l) {
-    if (l == null) {
-      return [];
-    }
-    List<Widget> list = [];
-    for (var item in l) {
-      list.add(Item(
-        item: item.name,
-        list: l,
-        itens: list,
-      ));
-    }
-    return list;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final T? list = context.read<CurrentLoadedData>().get<T>();
     final T fullList = context.read<Singletons>().returnRelevantModel<T>();
 
     return ShadowBox(
@@ -100,14 +81,20 @@ class ListingBox<T extends BaseModelsList> extends StatelessWidget {
       width: width,
       children: [
         Container(
-            color: const Color.fromARGB(68, 105, 101, 101),
-            width: width,
-            height: 40,
-            alignment: Alignment.center,
-            child: Text(title, style: const TextStyle(fontSize: 20))),
-        ListSelector(
-          itens: createList(list),
-          list: fullList,
+          color: const Color.fromARGB(68, 105, 101, 101),
+          width: width,
+          height: 40,
+          alignment: Alignment.center,
+          child: Text(title),
+        ),
+        Flexible(
+          child: Selector<CurrentLoadedData, T?>(
+            selector: (context, data) => data.get<T>(),
+            builder: (c, d, w) => ListSelector<T>(
+              itens: d?.map((e) => Item<T>(name: e.name)).toList() ?? [],
+              list: fullList,
+            ),
+          ),
         )
       ],
     );

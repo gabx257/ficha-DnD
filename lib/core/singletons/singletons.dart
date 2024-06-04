@@ -19,6 +19,6 @@ class Singletons {
       return equipment as T;
     }
 
-    throw Exception("Type not found");
+    throw Exception("Model not found");
   }
 }

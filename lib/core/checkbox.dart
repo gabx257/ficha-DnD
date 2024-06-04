@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class CustomCheckBox extends StatefulWidget {
   const CustomCheckBox({
     super.key,
-    required this.value,
+    this.value,
+    this.onChanged,
   });
 
-  final bool value;
+  final bool? value;
+  final ValueChanged<bool?>? onChanged;
 
   @override
   State<CustomCheckBox> createState() => _CustomCheckBoxState();
@@ -17,7 +19,7 @@ class _CustomCheckBoxState extends State<CustomCheckBox> {
 
   @override
   initState() {
-    _value = widget.value;
+    _value = widget.value ?? false;
     super.initState();
   }
 
@@ -33,6 +35,7 @@ class _CustomCheckBoxState extends State<CustomCheckBox> {
           setState(() {
             _value = s ?? false;
           });
+          widget.onChanged?.call(s);
         });
   }
 }

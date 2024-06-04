@@ -30,11 +30,25 @@ class ShadowBox extends StatelessWidget {
   EdgeInsets setpadding(p) {
     if (p == null) {
       return const EdgeInsets.all(10);
-    } else if (p.runtimeType == double || p.runtimeType == int) {
+    }
+    if (p is double || p is int) {
       return EdgeInsets.all(p.toDouble());
-    } else {
+    }
+    if (p is List) {
       return EdgeInsets.only(top: p[0], bottom: p[1], left: p[2], right: p[3]);
     }
+    if (p is Map) {
+      return EdgeInsets.only(
+        top: p['top'] ?? 0,
+        bottom: p['bottom'] ?? 0,
+        left: p['left'] ?? 0,
+        right: p['right'] ?? 0,
+      );
+    }
+    if (p is EdgeInsets) {
+      return p;
+    }
+    throw Exception('padding must be int, double, List, map or EdgeInsets');
   }
 
   @override

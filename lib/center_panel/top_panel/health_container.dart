@@ -40,30 +40,24 @@ class HealthContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final health = context.watch<HealthNotifier>();
-    return Stack(alignment: AlignmentDirectional.center, children: [
+    return Stack(alignment: AlignmentDirectional.topCenter, children: [
       CenterPanelBoxes(
-        shape: CustomPaint(
-          size: Size(shapesSize, shapesSize),
-          painter: HeartShape(
-            bodyColor: const Color.fromARGB(255, 255, 17, 0),
-            borderColor: Colors.white,
-            borderWidth: 5,
-            fillPercentage: health.percentage,
-          ),
+        shape: HeartShape(
+          bodyColor: const Color.fromARGB(255, 255, 17, 0),
+          borderColor: Colors.white,
+          borderWidth: 5,
+          fillPercentage: health.hpPercentage,
         ),
         size: shapesSize,
       ),
       CenterPanelBoxes(
         text: 'Health',
         value: health.health + health.temphealth,
-        shape: CustomPaint(
-          size: Size(shapesSize, shapesSize),
-          painter: HeartShape(
-            bodyColor: const Color.fromARGB(255, 255, 217, 0),
-            borderColor: const Color.fromARGB(0, 255, 255, 255),
-            borderWidth: 5,
-            fillPercentage: (health.percentage - 1),
-          ),
+        shape: HeartShape(
+          bodyColor: const Color.fromARGB(255, 255, 217, 0),
+          borderColor: const Color.fromARGB(0, 255, 255, 255),
+          borderWidth: 5,
+          fillPercentage: (health.tempHpPercentage),
         ),
         size: shapesSize,
       )
@@ -79,7 +73,7 @@ class TempHealthDSave extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Row(
-      children: [TempHealthContainer(), DSaveContainer()],
+      children: [TempHealthContainer(), SizedBox(width: 2), DSaveContainer()],
     );
   }
 }
@@ -91,25 +85,21 @@ class TempHealthContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LimitedBox(
-      maxWidth: 100,
-      child: ShadowBox(
-        mainAxis: MainAxisAlignment.end,
-        innerpadding: 0,
-        padding: const <double>[5, 0, 0, 0],
-        height: 85,
-        crossAxis: CrossAxisAlignment.stretch,
-        children: [
-          HealthPointsInputBox(),
-          Container(
-            color: const Color.fromARGB(255, 255, 17, 0),
-            child: const Text(
-              'bonus HP',
-              textAlign: TextAlign.center,
-            ),
-          )
-        ],
-      ),
+    return ShadowBox(
+      mainAxis: MainAxisAlignment.start,
+      innerpadding: const <double>[5, 0, 5, 5],
+      height: 85,
+      children: [
+        Text(
+          'bonus HP',
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+        SizedBox(
+            width: 50,
+            child: HealthPointsInputBox(
+              healthNotifier: context.read<HealthNotifier>(),
+            )),
+      ],
     );
   }
 }
@@ -121,32 +111,25 @@ class DSaveContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LimitedBox(
-      maxWidth: 150,
-      child: ShadowBox(
-        mainAxis: MainAxisAlignment.start,
-        direction: Axis.vertical,
-        innerpadding: 0,
-        padding: const <double>[5, 0, 0, 0],
-        height: 85,
-        crossAxis: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            color: const Color.fromARGB(255, 255, 17, 0),
-            child: const Text(
-              'D Save',
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SaveLine(text: "Success"),
-          const SaveLine(text: "Fail"),
-        ],
-      ),
+    return ShadowBox(
+      mainAxis: MainAxisAlignment.start,
+      direction: Axis.vertical,
+      innerpadding: const <double>[5, 0, 5, 5],
+      height: 85,
+      children: [
+        Text(
+          'Death Save',
+          style: Theme.of(context).textTheme.labelLarge,
+          textAlign: TextAlign.center,
+        ),
+        const SaveLine(text: "Success"),
+        const SaveLine(text: "Fail"),
+      ],
     );
   }
 }
 
-class SaveLine extends StatefulWidget {
+class SaveLine extends StatelessWidget {
   const SaveLine({
     super.key,
     required this.text,
@@ -155,25 +138,19 @@ class SaveLine extends StatefulWidget {
   final String text;
 
   @override
-  State<SaveLine> createState() => _SaveLineState();
-}
-
-class _SaveLineState extends State<SaveLine> {
-  final List<bool> _value = [false, false, false];
-
-  @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Row(
-          children: [
-            CustomCheckBox(value: _value[0]),
-            CustomCheckBox(value: _value[1]),
-            CustomCheckBox(value: _value[2]),
-            Text(widget.text)
-          ],
-        ),
-      ],
+    return SizedBox(
+      height: 25,
+      width: 150,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CustomCheckBox(),
+          const CustomCheckBox(),
+          const CustomCheckBox(),
+          SizedBox(width: 50, child: Text(text))
+        ],
+      ),
     );
   }
 }

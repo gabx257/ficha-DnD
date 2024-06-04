@@ -1,61 +1,55 @@
 import 'package:ficha/center_panel/notifiers/health.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 
 class TextInputBox extends StatelessWidget {
   final bool? filled;
   final int? maxchar;
-  final String? display;
+  final String? hint;
+  final String? initialValue;
+  final void Function(PointerDownEvent?, String)? onFinishEdit;
   final void Function(String)? onChanged;
-  final void Function(PointerDownEvent, String)? onTapOutside;
-  final TextEditingController? controller;
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
   final List<TextInputFormatter>? filter;
 
   TextInputBox(
       {super.key,
       this.filled,
       this.maxchar,
-      this.display,
-      this.onChanged,
-      this.onTapOutside,
+      this.hint,
+      this.initialValue,
+      this.onFinishEdit,
       this.filter,
-      this.controller});
+      this.onChanged});
 
-  final TextEditingController _controller = TextEditingController();
-
-  final FocusNode _focusNode = FocusNode();
-
-  void _onChanged(String value) {
-    _controller.text = value;
+  void _onTapOutside(PointerDownEvent event) {
+    onFinishEdit?.call(event, _controller.text);
+    _focusNode.unfocus();
   }
 
-  void _onTapOutside(PointerDownEvent event, HealthNotifier notifier) {
-    onTapOutside?.call(event, _controller.text);
-    _focusNode.unfocus();
+  void _onSubmited(String value) {
+    onFinishEdit?.call(null, value);
   }
 
   @override
   Widget build(BuildContext context) {
-    final health = context.watch<HealthNotifier>();
+    _controller.text = initialValue ?? '';
     return TextField(
-      style: const TextStyle(fontSize: 30),
       focusNode: _focusNode,
       controller: _controller,
-      onChanged: _onChanged,
-      onTapOutside: (e) => _onTapOutside(e, health),
+      onChanged: onChanged,
+      onSubmitted: _onSubmited,
+      onTapOutside: _onTapOutside,
       inputFormatters: filter ?? [FilteringTextInputFormatter.digitsOnly],
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.zero,
-        counter: const SizedBox(),
-        fillColor: Colors.grey,
-        filled: filled,
-        border: const OutlineInputBorder(borderSide: BorderSide.none),
-        focusedBorder: const OutlineInputBorder(
-          borderSide:
-              BorderSide(color: Color.fromARGB(157, 244, 67, 54), width: 2),
-        ),
-      ),
+      style: Theme.of(context).textTheme.titleLarge,
+      decoration: const InputDecoration()
+          .applyDefaults(Theme.of(context).inputDecorationTheme)
+          .copyWith(
+            filled: filled,
+            hintText: hint,
+          ),
       textAlign: TextAlign.center,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
@@ -65,18 +59,25 @@ class TextInputBox extends StatelessWidget {
 }
 
 class HealthPointsInputBox extends TextInputBox {
-  HealthPointsInputBox({
-    super.key,
-    super.filled,
-    super.maxchar,
-    super.display,
-    super.onChanged,
-    super.onTapOutside,
-  });
+  HealthPointsInputBox(
+      {super.key,
+      super.filled,
+      super.maxchar,
+      super.hint,
+      super.onFinishEdit,
+      required this.healthNotifier});
+
+  final HealthNotifier healthNotifier;
 
   @override
-  void _onTapOutside(PointerDownEvent event, HealthNotifier notifier) {
-    notifier.health = int.parse(_controller.text);
-    super._onTapOutside(event, notifier);
+  void _onTapOutside(PointerDownEvent event) {
+    healthNotifier.temphealth = int.tryParse(_controller.text) ?? 0;
+    super._onTapOutside(event);
+  }
+
+  @override
+  void _onSubmited(String value) {
+    healthNotifier.temphealth = int.tryParse(value) ?? 0;
+    super._onSubmited(value);
   }
 }
